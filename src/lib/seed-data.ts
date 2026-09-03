@@ -6,7 +6,7 @@ export const seedGames: SeedGame[] = [
   {
     slug: "free-fire",
     name: "Free Fire",
-    imageUrl: "/games-img/free-fire.jpeg",
+    imageUrl: "/images/games/free-fire.jpeg",
     sortOrder: 1,
     groups: [
       {
@@ -45,7 +45,7 @@ export const seedGames: SeedGame[] = [
   {
     slug: "tiktok",
     name: "TikTok Coins",
-    imageUrl: "https://sf-tb-sg.ibytedtos.com/obj/eden-sg/uhtyvueh7nulogpoguhm/tiktok-icon2.png",
+    imageUrl: "/images/games/tiktok.jpeg",
     sortOrder: 2,
     groups: [
       {
@@ -92,7 +92,7 @@ export const seedGames: SeedGame[] = [
   {
     slug: "pubg-mobile",
     name: "PUBG Mobile",
-    imageUrl: "/games-img/pubg-mobile.jpg",
+    imageUrl: "/images/games/pubg-mobile.jpg",
     sortOrder: 3,
     groups: [
       {
@@ -112,7 +112,7 @@ export const seedGames: SeedGame[] = [
   {
     slug: "efootball",
     name: "eFootball",
-    imageUrl: "https://cdn.akamai.steamstatic.com/steam/apps/1665460/capsule_616x353.jpg",
+    imageUrl: "/images/games/efootball.jpeg",
     sortOrder: 4,
     groups: [
       {

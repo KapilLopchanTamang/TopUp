@@ -1,8 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import { Russo_One, Chakra_Petch } from "next/font/google";
+import { Russo_One, Chakra_Petch, Geist } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
 import { getSettings } from "@/lib/data";
+import { cn } from "@/lib/utils";
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 const russo = Russo_One({ weight: "400", subsets: ["latin"], variable: "--font-russo", display: "swap" });
 const chakra = Chakra_Petch({ weight: ["300","400","500","600","700"], subsets: ["latin"], variable: "--font-chakra", display: "swap" });
@@ -41,7 +44,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const displayNumber = settings.whatsappNumber.replace(/^977/, "");
 
   return (
-    <html lang="en" suppressHydrationWarning className={`${russo.variable} ${chakra.variable} antialiased`}>
+    <html lang="en" suppressHydrationWarning className={cn("antialiased", russo.variable, chakra.variable, "font-sans", geist.variable)}>
       <body suppressHydrationWarning className="min-h-screen bg-[#0F131C] text-[#E2E8F0] flex flex-col font-[var(--font-chakra)]">
         <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 bg-white text-black px-4 py-2 rounded-full text-sm font-bold z-[100]">
           Skip to content

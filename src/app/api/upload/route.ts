@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFile } from 'fs/promises';
+import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { auth } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   // Check authentication
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   if (!session) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
@@ -45,14 +44,15 @@ export async function POST(request: NextRequest) {
     const originalName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
     const filename = `${timestamp}-${originalName}`;
 
-    // Save to public/uploads directory
-    const uploadDir = join(process.cwd(), 'public', 'uploads');
+    // Save to public/images/uploads directory
+    const uploadDir = join(process.cwd(), 'public', 'images', 'uploads');
+    await mkdir(uploadDir, { recursive: true });
     const filepath = join(uploadDir, filename);
 
     await writeFile(filepath, buffer);
 
     // Return the public URL
-    const imageUrl = `/uploads/${filename}`;
+    const imageUrl = `/images/uploads/${filename}`;
 
     return NextResponse.json({ imageUrl, success: true });
   } catch (error) {

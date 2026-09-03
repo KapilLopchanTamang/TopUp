@@ -1,46 +1,192 @@
-import { prisma } from "@/lib/db";
-import { deleteGame } from "@/lib/actions";
 import Link from "next/link";
 import Image from "next/image";
+import { prisma } from "@/lib/db";
+import { deleteGame } from "@/lib/actions";
 import type { Game } from "@/lib/types";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Gamepad2, Package, CheckCircle2, EyeOff, Plus } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboard() {
   let games: Game[] = [];
   try {
-    games = (await prisma.game.findMany({ include: { groups: { include: { rows: true } } }, orderBy: { sortOrder: "asc" } })) as unknown as Game[];
+    games = (await prisma.game.findMany({
+      include: { groups: { include: { rows: true } } },
+      orderBy: { sortOrder: "asc" },
+    })) as unknown as Game[];
   } catch {
     games = [];
   }
 
-  return (
-    <div>
-      <h1 className="text-xl font-black">Games ({games.length})</h1>
-      <p className="text-sm text-white/60">Manage packages, prices, and visibility.</p>
+  const activeCount = games.filter((g) => g.isActive).length;
+  const totalPackages = games.reduce(
+    (acc, g) => acc + g.groups.reduce((rAcc, grp) => rAcc + grp.rows.length, 0),
+    0
+  );
 
-      <div className="mt-6 grid gap-3">
-        {games.length === 0 && <div className="rounded-2xl bg-white/[0.04] border border-white/[0.06] p-8 text-center text-white/60">No games yet. Seed the DB or add one.</div>}
-        {games.map((g) => (
-          <div key={g.id} className="rounded-2xl bg-[#0E1220] border border-white/[0.06] p-4 flex items-center justify-between gap-4">
-            <div className="flex gap-3 items-center">
-              <div className="w-12 h-12 rounded-xl bg-white/10 overflow-hidden grid place-items-center text-xs relative">
-                {g.imageUrl ? <Image src={g.imageUrl} alt={g.name} fill className="object-cover" unoptimized /> : "🎮"}
-              </div>
-              <div>
-                <div className="font-bold text-sm">{g.name} <span className="text-white/40 font-mono text-xs">/{g.slug}</span> {g.isActive ? <span className="ml-2 text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300">Active</span> : <span className="ml-2 text-[10px] px-2 py-0.5 rounded-full bg-white/10">Hidden</span>}</div>
-                <div className="text-xs text-white/50">{g.groups.length} groups • {g.groups.reduce((a, c) => a + c.rows.length, 0)} packs</div>
-              </div>
-            </div>
-            <div className="flex gap-2">
-              <Link href={`/admin/games/${g.id}/edit`} className="text-xs font-bold px-4 py-2 rounded-full bg-white text-black">Edit</Link>
-              <form action={deleteGame.bind(null, g.id)}>
-                <button className="text-xs font-bold px-4 py-2 rounded-full bg-red-500/20 text-red-300 border border-red-500/20">Delete</button>
-              </form>
-            </div>
-          </div>
-        ))}
+  return (
+    <div className="space-y-6">
+      {/* Header and Stats */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-white">Games Catalog</h1>
+          <p className="text-sm text-white/60">
+            Manage your game offerings, package tiers, and live availability.
+          </p>
+        </div>
+        <Button render={<Link href="/admin/games/new" />} className="bg-violet-600 hover:bg-violet-500 text-white font-semibold">
+          <Plus className="mr-1 size-4" /> Add Game
+        </Button>
       </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <Card className="bg-[#0E1220] border-white/10">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-xs font-semibold uppercase tracking-wider text-white/50">
+              Total Games
+            </CardTitle>
+            <Gamepad2 className="size-4 text-violet-400" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-black text-white">{games.length}</div>
+            <p className="text-xs text-white/40 mt-1">Configured catalog entries</p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-[#0E1220] border-white/10">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-xs font-semibold uppercase tracking-wider text-white/50">
+              Active Storefront Games
+            </CardTitle>
+            <CheckCircle2 className="size-4 text-emerald-400" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-black text-white">{activeCount}</div>
+            <p className="text-xs text-white/40 mt-1">Visible to public buyers</p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-[#0E1220] border-white/10">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-xs font-semibold uppercase tracking-wider text-white/50">
+              Total Package Options
+            </CardTitle>
+            <Package className="size-4 text-cyan-400" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-black text-white">{totalPackages}</div>
+            <p className="text-xs text-white/40 mt-1">Across all game tiers</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Catalog Table */}
+      <Card className="bg-[#0E1220] border-white/10 overflow-hidden">
+        <CardHeader className="border-b border-white/10 pb-4">
+          <CardTitle className="text-base text-white">All Games</CardTitle>
+          <CardDescription className="text-white/50 text-xs">
+            Review sorting order, package count, and edit details.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="p-0">
+          {games.length === 0 ? (
+            <div className="p-12 text-center">
+              <Gamepad2 className="mx-auto size-10 text-white/20 mb-3" />
+              <h3 className="text-base font-semibold text-white">No games found</h3>
+              <p className="text-xs text-white/50 mt-1 max-w-sm mx-auto">
+                Seed initial data using `npm run db:seed` or click Add Game to create your first catalog entry.
+              </p>
+              <Button render={<Link href="/admin/games/new" />} className="mt-4 bg-violet-600 hover:bg-violet-500 text-white" size="sm">
+                Add Game
+              </Button>
+            </div>
+          ) : (
+            <Table>
+              <TableHeader className="border-white/10 bg-white/[0.02]">
+                <TableRow className="border-white/10 hover:bg-transparent">
+                  <TableHead className="w-[80px] text-white/60">Image</TableHead>
+                  <TableHead className="text-white/60">Game</TableHead>
+                  <TableHead className="text-white/60">Status</TableHead>
+                  <TableHead className="text-white/60">Packages</TableHead>
+                  <TableHead className="text-white/60 text-center">Order</TableHead>
+                  <TableHead className="text-right text-white/60">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {games.map((g) => {
+                  const packageCount = g.groups.reduce((acc, grp) => acc + grp.rows.length, 0);
+                  return (
+                    <TableRow key={g.id} className="border-white/10 hover:bg-white/[0.03]">
+                      <TableCell>
+                        <div className="size-12 rounded-lg bg-white/5 border border-white/10 overflow-hidden relative grid place-items-center">
+                          {g.imageUrl ? (
+                            <Image
+                              src={g.imageUrl}
+                              alt={g.name}
+                              fill
+                              className="object-cover"
+                            />
+                          ) : (
+                            <Gamepad2 className="size-5 text-white/30" />
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="font-semibold text-sm text-white">{g.name}</div>
+                        <div className="text-xs text-white/40 font-mono">/{g.slug}</div>
+                      </TableCell>
+                      <TableCell>
+                        {g.isActive ? (
+                          <Badge className="bg-emerald-500/15 text-emerald-300 border-emerald-500/20 hover:bg-emerald-500/20">
+                            Active
+                          </Badge>
+                        ) : (
+                          <Badge variant="secondary" className="bg-white/10 text-white/60 border-white/10">
+                            <EyeOff className="mr-1 size-3" /> Hidden
+                          </Badge>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-xs text-white/70">
+                        {g.groups.length} groups • {packageCount} packs
+                      </TableCell>
+                      <TableCell className="text-center font-mono text-xs text-white/50">
+                        {g.sortOrder}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <Button render={<Link href={`/admin/games/${g.id}/edit`} />} size="sm" variant="outline" className="h-8 border-white/10 text-white hover:bg-white/10">
+                            Edit
+                          </Button>
+                          <form action={deleteGame.bind(null, g.id)}>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              className="h-8 bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 border border-rose-500/30"
+                            >
+                              Delete
+                            </Button>
+                          </form>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

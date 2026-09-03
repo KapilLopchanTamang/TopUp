@@ -102,8 +102,21 @@ export function GameForm({ initial, action }: { initial?: Game; action: (fd: For
             Game Image <span className="text-red-400">*</span>
           </label>
 
-          {/* File Upload */}
           <div className="space-y-3">
+            {/* Direct URL input option */}
+            <div>
+              <label className="text-xs text-white/60 mb-1 block">Image Path or URL</label>
+              <input
+                type="text"
+                placeholder="/images/games/free-fire.jpeg or https://..."
+                value={imageUrl}
+                onChange={(e) => setImageUrl(e.target.value)}
+                className={fieldCls}
+              />
+            </div>
+
+            {/* File Upload */}
+            <div className="text-xs text-white/40 text-center uppercase tracking-wider my-1">or upload file</div>
             <label className="cursor-pointer block">
               <div className="px-4 py-3 rounded-xl bg-violet-600/15 border-2 border-dashed border-violet-500/30 hover:border-violet-500/50 transition-colors text-center">
                 <div className="text-violet-300 font-semibold text-sm">

@@ -1,225 +1,78 @@
-# ARG Topup - Game Top-Up Platform
+# ARG TopUp — Game Top-Up Platform
 
-A modern, secure platform for purchasing game currency and digital goods. Built with Next.js 16, Prisma, and NextAuth.
+A modern, high-performance web platform for browsing and purchasing game top-ups with instant WhatsApp fulfillment. Built with Next.js 16, React 19, Supabase Postgres, Prisma ORM, and NextAuth v5.
 
-![ARG Topup](public/uploads/freefire.jpeg)
+## Architecture & Tech Stack
 
-## 🚀 Features
+- **Framework**: Next.js 16 (App Router with Turbopack) & React 19
+- **Database**: PostgreSQL (Supabase) via Prisma ORM
+- **Authentication**: NextAuth.js v5 with JWT session strategy & Next 16 Proxy server guard
+- **Styling & UI**: Tailwind CSS, shadcn/ui components, Framer Motion
+- **Images**: Next.js optimized images under `public/images/`
+- **Checkout Flow**: Instant WhatsApp redirect with prefilled order details
 
-- 🎮 **Multi-Game Support** - Free Fire, PUBG Mobile, TikTok Coins, eFootball, and more
-- 🔐 **Secure Admin Panel** - Protected with NextAuth authentication
-- 📸 **Image Upload System** - Local image hosting with secure file uploads
-- 💰 **Dynamic Pricing** - Flexible pricing groups and highlighted best deals
-- 📱 **WhatsApp Integration** - Direct order placement via WhatsApp
-- 🎨 **Premium Dark UI** - Modern, responsive design with smooth animations
-- ⚡ **Next.js 16** - Using latest features with Turbopack
+## Documentation
 
-## 🛠️ Tech Stack
+Full project documentation is organized in the [`docs/`](./docs) directory:
 
-- **Framework:** Next.js 16 (React 19)
-- **Database:** SQLite (dev) / PostgreSQL (production)
-- **ORM:** Prisma
-- **Authentication:** NextAuth v5
-- **Styling:** Tailwind CSS
-- **Animations:** Framer Motion
-- **TypeScript:** Full type safety
+- **Product Requirements**: [`docs/product/prd.md`](./docs/product/prd.md)
+- **Local Setup**: [`docs/setup/local.md`](./docs/setup/local.md)
+- **Environment Variables**: [`docs/setup/env.md`](./docs/setup/env.md)
+- **Supabase Integration**: [`docs/setup/supabase.md`](./docs/setup/supabase.md)
+- **Vercel Deployment**: [`docs/deploy/vercel.md`](./docs/deploy/vercel.md)
+- **Admin Portal**: [`docs/features/admin.md`](./docs/features/admin.md)
+- **Images System**: [`docs/features/images.md`](./docs/features/images.md)
+- **WhatsApp Checkout**: [`docs/features/whatsapp.md`](./docs/features/whatsapp.md)
+- **Completed Milestones**: [`docs/changelog/completed.md`](./docs/changelog/completed.md)
 
-## 📦 Installation
+## Quick Start
 
-1. **Clone the repository:**
-```bash
-git clone <your-repo-url>
-cd topup
-```
+### 1. Install dependencies
 
-2. **Install dependencies:**
 ```bash
 npm install
 ```
 
-3. **Set up environment variables:**
+### 2. Configure Environment
+
 ```bash
 cp .env.example .env
 ```
 
-Edit `.env` with your values:
-```env
-DATABASE_URL="file:./dev.db"
-NEXTAUTH_SECRET="generate-with-openssl-rand-hex-32"
-NEXTAUTH_URL="http://localhost:3000"
-ADMIN_USERNAME="admin"
-ADMIN_PASSWORD="your-secure-password"
-WHATSAPP_NUMBER="9779843046108"
-```
+Configure your PostgreSQL database URL, NextAuth secret, and admin credentials in `.env`. See [`docs/setup/env.md`](./docs/setup/env.md) for the exact specification.
 
-4. **Set up database:**
+### 3. Deploy Migrations and Seed Database
+
 ```bash
-npm run db:push
+npx prisma migrate deploy
 npm run db:seed
 ```
 
-5. **Run development server:**
+### 4. Start Development Server
+
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000)
+Visit [http://localhost:3000](http://localhost:3000) to view the storefront, or [http://localhost:3000/admin](http://localhost:3000/admin) to manage games and settings.
 
-## 🚀 Deployment (Vercel)
+## Route Map
 
-### 1. Push to GitHub
+- `/` — Storefront homepage with featured games and banner
+- `/games` — Game catalog grid
+- `/games/[slug]` — Game package selection & WhatsApp order link
+- `/payment-methods` — Supported manual payment guides
+- `/contact` — Support and business contact info
+- `/admin/login` — Administrator authentication
+- `/admin` — Admin dashboard & game list
+- `/admin/games/new` — Create game with pricing tiers
+- `/admin/games/[id]/edit` — Edit game and package rows
+- `/admin/settings` — Configure site-wide settings
+
+## Verification
 
 ```bash
-git init
-git add .
-git commit -m "Initial commit"
-git branch -M main
-git remote add origin <your-github-repo-url>
-git push -u origin main
+npm run lint         # ESLint validation
+npx tsc --noEmit     # TypeScript compilation check
+npm run build        # Production build with Prisma deploy
 ```
-
-### 2. Deploy to Vercel
-
-1. Go to [vercel.com](https://vercel.com) and sign in
-2. Click "New Project"
-3. Import your GitHub repository
-4. Configure environment variables in Vercel dashboard:
-   - `DATABASE_URL` - Your PostgreSQL connection string (Vercel Postgres, Neon, or Supabase)
-   - `NEXTAUTH_SECRET` - Generate with `openssl rand -hex 32`
-   - `NEXTAUTH_URL` - Your production URL (e.g., `https://yoursite.vercel.app`)
-   - `ADMIN_USERNAME` - Admin username
-   - `ADMIN_PASSWORD` - Admin password
-   - `WHATSAPP_NUMBER` - Your WhatsApp number
-
-5. Click "Deploy"
-
-### 3. Set Up Production Database
-
-**Option A: Vercel Postgres** (Recommended)
-```bash
-# In your Vercel project dashboard
-1. Go to Storage tab
-2. Create Postgres Database
-3. Copy DATABASE_URL to environment variables
-```
-
-**Option B: Neon** (Free PostgreSQL)
-```bash
-1. Sign up at neon.tech
-2. Create a new project
-3. Copy the connection string
-4. Add to Vercel environment variables
-```
-
-### 4. Run Database Migration
-
-Vercel will automatically run:
-```bash
-prisma generate && prisma migrate deploy
-```
-
-## 📁 Project Structure
-
-```
-├── prisma/
-│   ├── schema.prisma      # Database schema
-│   └── seed.js           # Database seed data
-├── public/
-│   └── uploads/          # Uploaded game images
-├── src/
-│   ├── app/              # Next.js app directory
-│   │   ├── admin/        # Admin panel routes
-│   │   ├── api/          # API routes (upload, auth)
-│   │   ├── games/        # Game detail pages
-│   │   └── page.tsx      # Homepage
-│   ├── components/       # React components
-│   ├── lib/              # Utilities
-│   │   ├── actions.ts    # Server actions
-│   │   ├── auth.ts       # NextAuth config
-│   │   ├── data.ts       # Database queries
-│   │   └── env.ts        # Environment validation
-│   └── proxy.ts          # Next.js 16 proxy (middleware)
-└── scripts/              # Utility scripts
-```
-
-## 🔒 Security Features
-
-- ✅ Environment variable validation
-- ✅ Input sanitization and validation
-- ✅ Secure file upload (5MB limit, type validation)
-- ✅ Admin authentication required
-- ✅ SQL injection protection (Prisma)
-- ✅ XSS protection (React escaping)
-- ✅ CSRF protection (NextAuth)
-
-## 🎮 Admin Panel
-
-Access at `/admin` with credentials from `.env`
-
-**Features:**
-- Create/Edit/Delete games
-- Upload game images (drag & drop)
-- Manage pricing groups
-- Toggle game visibility
-- Reorder games
-
-## 📸 Image Upload
-
-Admin can upload images directly:
-- **Formats:** JPEG, PNG, WebP
-- **Max Size:** 5MB
-- **Storage:** `public/uploads/`
-- **Auto-optimization:** Yes (Next.js Image)
-
-## 🛒 Order Flow
-
-1. User selects game
-2. Chooses package
-3. Clicks "Order via WhatsApp"
-4. Pre-filled WhatsApp message opens
-5. User sends order
-6. Admin processes manually
-
-## 📝 Environment Variables
-
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `DATABASE_URL` | Database connection string | `file:./dev.db` |
-| `NEXTAUTH_SECRET` | NextAuth secret key | `openssl rand -hex 32` |
-| `NEXTAUTH_URL` | Site URL | `http://localhost:3000` |
-| `ADMIN_USERNAME` | Admin username | `admin` |
-| `ADMIN_PASSWORD` | Admin password | `secure-password` |
-| `WHATSAPP_NUMBER` | WhatsApp number | `9779843046108` |
-
-## 🐛 Troubleshooting
-
-**Build fails on Vercel:**
-- Check environment variables are set
-- Ensure PostgreSQL connection string is correct
-- Verify all migrations are committed
-
-**Images not loading:**
-- Check `public/uploads/` directory exists
-- Verify image paths start with `/uploads/`
-- Ensure Next.js image configuration is correct
-
-**Admin login fails:**
-- Verify `ADMIN_USERNAME` and `ADMIN_PASSWORD` in `.env`
-- Check `NEXTAUTH_SECRET` is set
-- Ensure `NEXTAUTH_URL` matches your domain
-
-## 📄 License
-
-MIT
-
-## 🤝 Contributing
-
-Contributions welcome! Please open an issue first to discuss changes.
-
-## 📧 Contact
-
-For support, contact via WhatsApp: +977 9843046108
-
----
-
-Built with ❤️ using Next.js 16

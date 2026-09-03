@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports, @typescript-eslint/no-unused-vars */
 const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
@@ -9,7 +10,7 @@ async function seed() {
   try {
     await prisma.game.deleteMany({});
     console.log('✅ Cleared existing games');
-  } catch (error) {
+  } catch (_error) {
     console.log('ℹ️  No existing data to clear');
   }
 
@@ -18,7 +19,7 @@ async function seed() {
     {
       name: 'Free Fire',
       slug: 'free-fire',
-      imageUrl: '/uploads/freefire.jpeg',
+      imageUrl: '/images/games/free-fire.jpeg',
       isActive: true,
       sortOrder: 1,
       groups: {
@@ -41,7 +42,7 @@ async function seed() {
     {
       name: 'PUBG Mobile',
       slug: 'pubg-mobile',
-      imageUrl: '/uploads/pubg.jpeg',
+      imageUrl: '/images/games/pubg-mobile.jpg',
       isActive: true,
       sortOrder: 2,
       groups: {
@@ -64,7 +65,7 @@ async function seed() {
     {
       name: 'TikTok Coins',
       slug: 'tiktok',
-      imageUrl: '/uploads/tiktok.jpeg',
+      imageUrl: '/images/games/tiktok.jpeg',
       isActive: true,
       sortOrder: 3,
       groups: {
@@ -87,7 +88,7 @@ async function seed() {
     {
       name: 'eFootball',
       slug: 'efootball',
-      imageUrl: '/uploads/efootball.jpeg',
+      imageUrl: '/images/games/efootball.jpeg',
       isActive: true,
       sortOrder: 4,
       groups: {

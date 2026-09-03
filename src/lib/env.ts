@@ -4,7 +4,8 @@ const requiredEnvVars = [
   'NEXTAUTH_SECRET',
   'NEXTAUTH_URL',
   'ADMIN_EMAIL',
-  'ADMIN_PASSWORD_HASH'
+  'ADMIN_PASSWORD_HASH',
+  'WHATSAPP_NUMBER',
 ] as const;
 
 function validateEnv() {
@@ -37,5 +38,15 @@ function validateEnv() {
 
 // Run validation on module load
 validateEnv();
+
+export const env = {
+  get DATABASE_URL() { return process.env.DATABASE_URL!; },
+  get DIRECT_URL() { return process.env.DIRECT_URL; },
+  get NEXTAUTH_SECRET() { return process.env.NEXTAUTH_SECRET!; },
+  get NEXTAUTH_URL() { return process.env.NEXTAUTH_URL!; },
+  get ADMIN_EMAIL() { return process.env.ADMIN_EMAIL!; },
+  get ADMIN_PASSWORD_HASH() { return process.env.ADMIN_PASSWORD_HASH!; },
+  get WHATSAPP_NUMBER() { return process.env.WHATSAPP_NUMBER!; },
+};
 
 export { validateEnv };
