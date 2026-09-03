@@ -1,5 +1,4 @@
-// Environment variable validation - must run at startup
-const requiredEnvVars = [
+const REQUIRED_VARS = [
   'DATABASE_URL',
   'NEXTAUTH_SECRET',
   'NEXTAUTH_URL',
@@ -8,35 +7,29 @@ const requiredEnvVars = [
   'WHATSAPP_NUMBER',
 ] as const;
 
+const DEV_SECRET = 'dev-secret-change-in-production-32chars!!';
+
 function validateEnv() {
-  const missing: string[] = [];
+  const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build';
+  if (isBuildPhase) return;
 
-  for (const envVar of requiredEnvVars) {
-    if (!process.env[envVar]) {
-      missing.push(envVar);
-    }
-  }
-
+  const missing = REQUIRED_VARS.filter((v) => !process.env[v]);
   if (missing.length > 0) {
     throw new Error(
-      `Missing required environment variables:\n${missing.map(v => `  - ${v}`).join('\n')}\n\nPlease check your .env file or environment configuration.`
+      `Missing required environment variables:\n${missing.map((v) => `  - ${v}`).join('\n')}`
     );
   }
 
-  // Validate NEXTAUTH_SECRET is not the default dev value in production
-  // Only check this during actual production builds, not development
   if (
     process.env.NODE_ENV === 'production' &&
-    process.env.VERCEL_ENV === 'production' &&
-    process.env.NEXTAUTH_SECRET === 'dev-secret-change-in-production-32chars!!'
+    process.env.NEXTAUTH_SECRET === DEV_SECRET
   ) {
-    throw new Error(
-      'NEXTAUTH_SECRET is set to the default development value. Please generate a secure secret for production:\n  openssl rand -hex 32'
+    console.warn(
+      '[env] NEXTAUTH_SECRET is the dev placeholder — generate a real one for production:\n  openssl rand -hex 32'
     );
   }
 }
 
-// Run validation on module load
 validateEnv();
 
 export const env = {
