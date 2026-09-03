@@ -1,0 +1,178 @@
+"use server";
+import { prisma } from "./db";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+
+type RowInput = { amountLabel: string; price: string; isHighlighted?: boolean; sortOrder: number };
+type GroupInput = { label?: string; sortOrder: number; rows: RowInput[] };
+
+function sanitizeSlug(input: string): string {
+  return input
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9-]/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+function validatePrice(price: string): boolean {
+  const num = parseFloat(price);
+  return !isNaN(num) && num > 0;
+}
+
+export async function createGame(formData: FormData) {
+  const name = String(formData.get("name") || "").trim();
+  let slug = String(formData.get("slug") || "").trim();
+  const imageUrl = String(formData.get("imageUrl") || "").trim() || null;
+  const sortOrder = parseInt(String(formData.get("sortOrder") || "0"), 10) || 0;
+  const isActive = formData.get("isActive") === "on";
+  const groupsJson = String(formData.get("groupsJson") || "[]");
+  let groups: GroupInput[] = [];
+  try {
+    groups = JSON.parse(groupsJson);
+  } catch {
+    throw new Error("Invalid groups data");
+  }
+
+  if (!name || !slug) throw new Error("Name and slug are required");
+
+  // Sanitize slug
+  slug = sanitizeSlug(slug);
+  if (!slug) throw new Error("Invalid slug format");
+
+  // Check for duplicate slug
+  const existing = await prisma.game.findUnique({ where: { slug } });
+  if (existing) throw new Error(`A game with slug "${slug}" already exists`);
+
+  // Validate prices
+  for (const g of groups) {
+    for (const r of g.rows) {
+      if (!validatePrice(r.price)) {
+        throw new Error(`Invalid price: ${r.price}. Prices must be positive numbers.`);
+      }
+    }
+  }
+
+  // Use transaction for atomic operation
+  await prisma.$transaction(async (tx) => {
+    const game = await tx.game.create({
+      data: { name, slug, imageUrl, sortOrder, isActive },
+    });
+
+    for (const g of groups) {
+      const group = await tx.packageGroup.create({
+        data: { gameId: game.id, label: g.label || null, sortOrder: g.sortOrder },
+      });
+      for (const r of g.rows) {
+        await tx.packageRow.create({
+          data: {
+            groupId: group.id,
+            amountLabel: r.amountLabel,
+            price: r.price,
+            isHighlighted: !!r.isHighlighted,
+            sortOrder: r.sortOrder,
+          },
+        });
+      }
+    }
+  });
+
+  revalidatePath("/");
+  revalidatePath("/games");
+  redirect("/admin");
+}
+
+export async function updateGame(id: string, formData: FormData) {
+  const name = String(formData.get("name") || "").trim();
+  let slug = String(formData.get("slug") || "").trim();
+  const imageUrlInput = String(formData.get("imageUrl") || "").trim();
+
+  const existing = await prisma.game.findUnique({ where: { id }, select: { imageUrl: true, slug: true } });
+  if (!existing) throw new Error("Game not found");
+
+  const imageUrl = imageUrlInput || existing.imageUrl || null;
+
+  const sortOrder = parseInt(String(formData.get("sortOrder") || "0"), 10) || 0;
+  const isActive = formData.get("isActive") === "on";
+  const groupsJson = String(formData.get("groupsJson") || "[]");
+  let groups: GroupInput[] = [];
+  try {
+    groups = JSON.parse(groupsJson);
+  } catch {
+    throw new Error("Invalid groups data");
+  }
+
+  if (!name || !slug) throw new Error("Name and slug are required");
+
+  // Sanitize slug
+  slug = sanitizeSlug(slug);
+  if (!slug) throw new Error("Invalid slug format");
+
+  // Check for duplicate slug (excluding current game)
+  if (slug !== existing.slug) {
+    const duplicate = await prisma.game.findUnique({ where: { slug } });
+    if (duplicate) throw new Error(`A game with slug "${slug}" already exists`);
+  }
+
+  // Validate prices
+  for (const g of groups) {
+    for (const r of g.rows) {
+      if (!validatePrice(r.price)) {
+        throw new Error(`Invalid price: ${r.price}. Prices must be positive numbers.`);
+      }
+    }
+  }
+
+  // Use transaction for atomic operation
+  await prisma.$transaction(async (tx) => {
+    await tx.game.update({ where: { id }, data: { name, slug, imageUrl, sortOrder, isActive } });
+
+    await tx.packageGroup.deleteMany({ where: { gameId: id } });
+    for (const g of groups) {
+      const group = await tx.packageGroup.create({
+        data: { gameId: id, label: g.label || null, sortOrder: g.sortOrder },
+      });
+      for (const r of g.rows) {
+        await tx.packageRow.create({
+          data: {
+            groupId: group.id,
+            amountLabel: r.amountLabel,
+            price: r.price,
+            isHighlighted: !!r.isHighlighted,
+            sortOrder: r.sortOrder,
+          },
+        });
+      }
+    }
+  });
+
+  revalidatePath("/");
+  revalidatePath("/games");
+  revalidatePath(`/games/${slug}`);
+  redirect("/admin");
+}
+
+export async function deleteGame(id: string) {
+  await prisma.game.delete({ where: { id } });
+  revalidatePath("/");
+  revalidatePath("/games");
+}
+
+export async function updateSettings(formData: FormData) {
+  const whatsappNumber = String(formData.get("whatsappNumber") || "").trim();
+  const facebookUrl = String(formData.get("facebookUrl") || "").trim() || null;
+  const messengerUrl = String(formData.get("messengerUrl") || "").trim() || null;
+  const paymentMethodsText = String(formData.get("paymentMethodsText") || "").trim() || null;
+  const promoBannerText = String(formData.get("promoBannerText") || "").trim() || null;
+
+  await prisma.siteSettings.upsert({
+    where: { id: 1 },
+    update: { whatsappNumber, facebookUrl, messengerUrl, paymentMethodsText, promoBannerText },
+    create: { id: 1, whatsappNumber, facebookUrl, messengerUrl, paymentMethodsText, promoBannerText },
+  });
+
+  revalidatePath("/");
+  revalidatePath("/payment-methods");
+  revalidatePath("/contact");
+  redirect("/admin");
+}

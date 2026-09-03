@@ -1,0 +1,50 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Game {
+  id        String         @id @default(cuid())
+  slug      String         @unique
+  name      String
+  imageUrl  String?
+  sortOrder Int            @default(0)
+  isActive  Boolean        @default(true)
+  groups    PackageGroup[]
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  @@index([isActive, sortOrder])
+}
+
+model PackageGroup {
+  id        String       @id @default(cuid())
+  gameId    String
+  game      Game         @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  label     String?
+  sortOrder Int          @default(0)
+  rows      PackageRow[]
+}
+
+model PackageRow {
+  id            String       @id @default(cuid())
+  groupId       String
+  group         PackageGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  amountLabel   String
+  price         String
+  isHighlighted Boolean      @default(false)
+  sortOrder     Int          @default(0)
+}
+
+model SiteSettings {
+  id                 Int    @id @default(1)
+  whatsappNumber     String @default("9779863912884")
+  facebookUrl        String?
+  messengerUrl       String?
+  paymentMethodsText String?
+  promoBannerText    String?
+}
