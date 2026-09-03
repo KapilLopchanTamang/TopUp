@@ -44,7 +44,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const displayNumber = settings.whatsappNumber.replace(/^977/, "");
 
   return (
-    <html lang="en" suppressHydrationWarning className={cn("antialiased", russo.variable, chakra.variable, "font-sans", geist.variable)}>
+    <html lang="en" data-scroll-behavior="smooth" suppressHydrationWarning className={cn("antialiased", russo.variable, chakra.variable, "font-sans", geist.variable)}>
       <body suppressHydrationWarning className="min-h-screen bg-[#0F131C] text-[#E2E8F0] flex flex-col font-[var(--font-chakra)]">
         <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 bg-white text-black px-4 py-2 rounded-full text-sm font-bold z-[100]">
           Skip to content
