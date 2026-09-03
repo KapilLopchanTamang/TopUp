@@ -1,1 +1,2 @@
+@AGENT.md
 @AGENTS.md
