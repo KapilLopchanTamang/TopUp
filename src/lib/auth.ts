@@ -2,7 +2,15 @@ import NextAuth from "next-auth";
 import type { NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
 import { env } from "@/lib/env";
+
+function safeCompare(a: string, b: string): boolean {
+  const bufA = Buffer.from(a);
+  const bufB = Buffer.from(b);
+  if (bufA.length !== bufB.length) return false;
+  return crypto.timingSafeEqual(bufA, bufB);
+}
 
 export const authConfig: NextAuthConfig = {
   providers: [
@@ -14,13 +22,13 @@ export const authConfig: NextAuthConfig = {
       },
       async authorize(credentials) {
         const email = env.ADMIN_EMAIL;
-        const hash = env.ADMIN_PASSWORD_HASH;
+        const expectedPassword = env.ADMIN_PASSWORD;
         const credEmail = credentials?.email;
         const credPass = credentials?.password;
 
         if (
           !email ||
-          !hash ||
+          !expectedPassword ||
           typeof credEmail !== "string" ||
           typeof credPass !== "string"
         ) {
@@ -31,7 +39,17 @@ export const authConfig: NextAuthConfig = {
           return null;
         }
 
-        const ok = await bcrypt.compare(credPass, hash);
+        let ok = false;
+        if (
+          expectedPassword.startsWith("$2a$") ||
+          expectedPassword.startsWith("$2b$") ||
+          expectedPassword.startsWith("$2y$")
+        ) {
+          ok = await bcrypt.compare(credPass, expectedPassword);
+        } else {
+          ok = safeCompare(credPass, expectedPassword);
+        }
+
         if (!ok) return null;
 
         return { id: "admin", email };

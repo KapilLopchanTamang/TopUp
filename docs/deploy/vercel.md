@@ -18,7 +18,7 @@ Set the following variables in your Vercel Project Settings (`Settings -> Enviro
 | `NEXTAUTH_SECRET` | 32-character hex secret for signing session JWTs | Generate via `openssl rand -hex 32` |
 | `NEXTAUTH_URL` | Production URL of your deployment | `https://your-domain.vercel.app` |
 | `ADMIN_EMAIL` | Administrator email address | `admin@arg-topup.com` |
-| `ADMIN_PASSWORD_HASH` | Bcrypt hash of admin password | Generated via bcryptjs |
+| `ADMIN_PASSWORD` | 12-digit admin password | `123456789012` |
 | `WHATSAPP_NUMBER` | Contact WhatsApp number without symbols | `9779863912884` |
 
 ## 3. Build Configuration

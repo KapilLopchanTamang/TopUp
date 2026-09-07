@@ -26,16 +26,11 @@ NEXTAUTH_URL="http://localhost:3000"
 
 ```bash
 ADMIN_EMAIL="admin@example.com"
-ADMIN_PASSWORD_HASH="$2a$10$..."
+ADMIN_PASSWORD="123456789012"
 ```
 
 - `ADMIN_EMAIL` — Email for admin login
-- `ADMIN_PASSWORD_HASH` — bcrypt hash of password
-
-Generate hash:
-```bash
-node -e "console.log(require('bcryptjs').hashSync('your-password', 10))"
-```
+- `ADMIN_PASSWORD` — Admin password (clean 12-digit PIN/password, or characters; bcrypt hashes also supported as fallback)
 
 ## WhatsApp
 

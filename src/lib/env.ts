@@ -3,7 +3,7 @@ const REQUIRED_VARS = [
   'NEXTAUTH_SECRET',
   'NEXTAUTH_URL',
   'ADMIN_EMAIL',
-  'ADMIN_PASSWORD_HASH',
+  'ADMIN_PASSWORD',
   'WHATSAPP_NUMBER',
 ] as const;
 
@@ -13,7 +13,12 @@ function validateEnv() {
   const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build';
   if (isBuildPhase) return;
 
-  const missing = REQUIRED_VARS.filter((v) => !process.env[v]);
+  const missing = REQUIRED_VARS.filter((v) => {
+    if (v === 'ADMIN_PASSWORD') {
+      return !process.env.ADMIN_PASSWORD && !process.env.ADMIN_PASSWORD_HASH;
+    }
+    return !process.env[v];
+  });
   if (missing.length > 0) {
     throw new Error(
       `Missing required environment variables:\n${missing.map((v) => `  - ${v}`).join('\n')}`
@@ -38,7 +43,8 @@ export const env = {
   get NEXTAUTH_SECRET() { return process.env.NEXTAUTH_SECRET!; },
   get NEXTAUTH_URL() { return process.env.NEXTAUTH_URL!; },
   get ADMIN_EMAIL() { return process.env.ADMIN_EMAIL!; },
-  get ADMIN_PASSWORD_HASH() { return process.env.ADMIN_PASSWORD_HASH!; },
+  get ADMIN_PASSWORD() { return process.env.ADMIN_PASSWORD || process.env.ADMIN_PASSWORD_HASH || ''; },
+  get ADMIN_PASSWORD_HASH() { return process.env.ADMIN_PASSWORD_HASH || ''; },
   get WHATSAPP_NUMBER() { return process.env.WHATSAPP_NUMBER!; },
 };
 

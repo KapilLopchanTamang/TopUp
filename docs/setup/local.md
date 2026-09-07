@@ -24,7 +24,7 @@
    - `DATABASE_URL` — Supabase Postgres connection string
    - `NEXTAUTH_SECRET` — Generate with `openssl rand -hex 32`
    - `ADMIN_EMAIL` — Your admin email
-   - `ADMIN_PASSWORD_HASH` — Generate with `node -e "console.log(require('bcryptjs').hashSync('password', 10))"`
+   - `ADMIN_PASSWORD` — Your 12-digit admin password (e.g. 123456789012)
    - `WHATSAPP_NUMBER` — Your WhatsApp number
 
    See [env.md](./env.md) for details.

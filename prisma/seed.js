@@ -117,6 +117,20 @@ async function seed() {
     console.log(`✅ Created game: ${game.name}`);
   }
 
+  await prisma.siteSettings.upsert({
+    where: { id: 1 },
+    update: {},
+    create: {
+      id: 1,
+      whatsappNumber: '9779863912884',
+      facebookUrl: 'https://facebook.com/allroundergamingtopup',
+      messengerUrl: 'https://m.me/allroundergamingtopup',
+      paymentMethodsText: 'eSewa • Khalti • IME Pay • Bank Transfer',
+      promoBannerText: '⚡ Instant Delivery • 100% Secure • Best Price Guaranteed',
+    },
+  });
+  console.log('✅ Site settings configured');
+
   console.log('🎉 Database seeded successfully!');
 }
 

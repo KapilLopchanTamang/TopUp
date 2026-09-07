@@ -9,7 +9,7 @@ describe("Environment Contract", () => {
     "NEXTAUTH_SECRET",
     "NEXTAUTH_URL",
     "ADMIN_EMAIL",
-    "ADMIN_PASSWORD_HASH",
+    "ADMIN_PASSWORD",
     "WHATSAPP_NUMBER",
   ];
 
