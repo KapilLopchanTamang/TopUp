@@ -61,7 +61,7 @@ export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
                   <SidebarMenuButton
                     render={<Link href={item.url} />}
                     isActive={item.active}
-                    className="hover:bg-white/[0.08] text-white/80 hover:text-white rounded-lg px-3 py-2 text-sm font-medium transition-colors"
+                    className="hover:bg-white/[0.08] text-white/70 hover:text-white data-[active=true]:bg-violet-600/20 data-[active=true]:text-violet-300 data-[active=true]:font-semibold rounded-lg px-3 py-2 text-sm font-medium transition-colors"
                   >
                     <Icon className="size-4 text-violet-400" />
                     <span>{item.title}</span>
@@ -80,10 +80,10 @@ export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
             <SidebarMenuItem>
               <SidebarMenuButton
                 render={<Link href="/" target="_blank" />}
-                className="hover:bg-white/[0.08] text-white/70 hover:text-white rounded-lg px-3 py-2 text-sm transition-colors"
+                className="hover:bg-white/[0.08] text-white/60 hover:text-white rounded-lg px-3 py-2 text-sm transition-colors"
               >
                 <Store className="size-4 text-cyan-400" />
-                <span>View Public Storefront ↗</span>
+                <span>View Storefront ↗</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
@@ -93,7 +93,7 @@ export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
       <SidebarFooter className="border-t border-white/10 p-3">
         <button
           onClick={() => signOut({ callbackUrl: "/admin/login" })}
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold text-rose-300 hover:bg-rose-500/10 transition-colors cursor-pointer"
+          className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-semibold text-rose-300 hover:bg-rose-500/15 hover:text-rose-200 transition-colors cursor-pointer border border-transparent hover:border-rose-500/20"
         >
           <LogOut className="size-4 text-rose-400" />
           <span>Sign Out</span>

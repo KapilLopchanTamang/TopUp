@@ -63,11 +63,21 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
             <div className="flex items-center gap-2">
               <Link
-                href="/admin/games/new"
-                className="text-xs font-bold px-3.5 py-1.5 rounded-lg bg-violet-600 hover:bg-violet-500 text-white transition-colors"
+                href="/"
+                target="_blank"
+                className="text-xs text-white/60 hover:text-white flex items-center gap-1 px-3 py-1.5 rounded-lg border border-white/10 hover:bg-white/[0.06] transition-colors"
               >
-                + New Game
+                <span>Storefront</span>
+                <span className="text-white/40">↗</span>
               </Link>
+              {pathname !== "/admin" && pathname !== "/admin/games/new" && (
+                <Link
+                  href="/admin/games/new"
+                  className="text-xs font-bold px-3 py-1.5 rounded-lg bg-violet-600 hover:bg-violet-500 text-white transition-colors"
+                >
+                  + New Game
+                </Link>
+              )}
             </div>
           </header>
 

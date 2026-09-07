@@ -14,7 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Gamepad2, Package, CheckCircle2, EyeOff, Plus } from "lucide-react";
+import { Gamepad2, Package, CheckCircle2, EyeOff, Plus, Edit, Trash2 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -165,15 +165,22 @@ export default async function AdminDashboard() {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-2">
-                          <Button render={<Link href={`/admin/games/${g.id}/edit`} />} size="sm" variant="outline" className="h-8 border-white/10 text-white hover:bg-white/10">
+                          <Button
+                            render={<Link href={`/admin/games/${g.id}/edit`} />}
+                            size="sm"
+                            variant="ghost"
+                            className="h-8 px-2.5 text-xs font-medium border border-white/10 bg-white/[0.04] text-white hover:bg-white/[0.1] hover:text-white"
+                          >
+                            <Edit className="mr-1 size-3.5 text-violet-400" />
                             Edit
                           </Button>
                           <form action={deleteGame.bind(null, g.id)}>
                             <Button
                               size="sm"
                               variant="destructive"
-                              className="h-8 bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 border border-rose-500/30"
+                              className="h-8 px-2.5 text-xs font-medium bg-rose-500/15 text-rose-300 hover:bg-rose-500/25 hover:text-rose-200 border border-rose-500/20"
                             >
+                              <Trash2 className="mr-1 size-3.5 text-rose-400" />
                               Delete
                             </Button>
                           </form>
