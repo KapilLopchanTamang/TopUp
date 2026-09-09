@@ -1,9 +1,11 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
 import type { Game, GameGroup, GameRow } from "@/lib/types";
 import { buildWhatsAppUrl } from "@/lib/whatsapp";
 import { BannerPreviewModal } from "@/components/BannerPreviewModal";
+import { CurrencyIcon } from "@/components/CurrencyIcon";
 import { Badge } from "@/components/ui/badge";
 
 interface BannerGameListingProps {
@@ -68,7 +70,7 @@ export function BannerGameListing({ game, whatsappNumber }: BannerGameListingPro
 }
 
 /* =========================================================================
-   1. FREE FIRE LISTING (Matches Free Fire Banner)
+   1. FREE FIRE LISTING (Uses Official Free Fire Diamond Photo)
    ========================================================================= */
 function FreeFireListing({ game, whatsappNumber }: { game: Game; whatsappNumber: string }) {
   const diamondGroup = game.groups.find((g) => g.label?.toLowerCase().includes("diamond")) || game.groups[0];
@@ -108,10 +110,16 @@ function FreeFireListing({ game, whatsappNumber }: { game: Game; whatsappNumber:
         <div className="absolute top-0 right-0 w-64 h-64 bg-[#00E5FF]/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#F43F5E]/10 rounded-full blur-3xl pointer-events-none" />
 
-        {/* Section Pill */}
+        {/* Section Pill with Free Fire Diamond Photo */}
         <div className="flex justify-center mb-6">
-          <div className="px-6 py-2 rounded-full bg-gradient-to-r from-[#7C3AED] to-[#EC4899] text-white font-[var(--font-russo)] text-sm tracking-wider uppercase shadow-[0_0_20px_rgba(236,72,153,0.4)]">
-            💎 DIAMOND TOPUP 💎
+          <div className="flex items-center gap-2.5 px-6 py-2 rounded-full bg-gradient-to-r from-[#7C3AED] to-[#EC4899] text-white font-[var(--font-russo)] text-sm tracking-wider uppercase shadow-[0_0_20px_rgba(236,72,153,0.4)]">
+            <div className="w-5 h-5 relative shrink-0">
+              <Image src="/images/coins/free-fire-diamond.jpeg" alt="Free Fire Diamond" fill className="object-contain" unoptimized />
+            </div>
+            <span>DIAMOND TOPUP</span>
+            <div className="w-5 h-5 relative shrink-0">
+              <Image src="/images/coins/free-fire-diamond.jpeg" alt="Free Fire Diamond" fill className="object-contain" unoptimized />
+            </div>
           </div>
         </div>
 
@@ -319,11 +327,20 @@ function DiamondItemRow({ row, gameName, whatsappNumber }: { row: GameRow; gameN
           : "bg-white/[0.02] border border-white/[0.06] hover:bg-white/[0.05]"
       }`}
     >
-      <div className="flex items-center gap-2">
-        <span className="text-sm">💎</span>
-        <span className="font-bold text-white text-sm">{row.amountLabel}</span>
+      <div className="flex items-center gap-2 min-w-0">
+        <div className="w-5 h-5 relative shrink-0">
+          <Image
+            src="/images/coins/free-fire-diamond.jpeg"
+            alt="Free Fire Diamond"
+            fill
+            sizes="20px"
+            className="object-contain drop-shadow-[0_0_6px_rgba(0,229,255,0.4)]"
+            unoptimized
+          />
+        </div>
+        <span className="font-bold text-white text-sm truncate">{row.amountLabel}</span>
         {row.isHighlighted && (
-          <Badge className="text-[9px] font-black uppercase px-1.5 py-0.2 bg-[#F43F5E] text-white border-none">
+          <Badge className="text-[9px] font-black uppercase px-1.5 py-0.2 bg-[#F43F5E] text-white border-none shrink-0">
             POPULAR
           </Badge>
         )}
@@ -346,7 +363,7 @@ function DiamondItemRow({ row, gameName, whatsappNumber }: { row: GameRow; gameN
 }
 
 /* =========================================================================
-   2. TIKTOK COIN LISTING (Matches TikTok Banner)
+   2. TIKTOK COIN LISTING (Uses Official TikTok Coin Photo)
    ========================================================================= */
 function TikTokListing({ game, whatsappNumber }: { game: Game; whatsappNumber: string }) {
   const smallPack = game.groups.find((g) => g.label?.toLowerCase().includes("small")) || game.groups[0];
@@ -369,10 +386,16 @@ function TikTokListing({ game, whatsappNumber }: { game: Game; whatsappNumber: s
 
       {/* Main Container: TIKTOK COIN PRICE LIST */}
       <div className="rounded-3xl bg-[#0F131C] border-2 border-[#F43F5E]/40 shadow-[0_0_40px_rgba(244,63,94,0.15)] p-5 sm:p-7">
-        <div className="text-center mb-6">
-          <span className="px-5 py-1.5 rounded-full bg-gradient-to-r from-[#F43F5E] to-[#EAB308] text-white font-[var(--font-russo)] text-xs tracking-wider uppercase shadow-md">
-            TIKTOK COIN PRICE LIST
-          </span>
+        <div className="flex justify-center mb-6">
+          <div className="flex items-center gap-2 px-5 py-1.5 rounded-full bg-gradient-to-r from-[#F43F5E] to-[#EAB308] text-white font-[var(--font-russo)] text-xs tracking-wider uppercase shadow-md">
+            <div className="w-4 h-4 relative shrink-0 rounded-full overflow-hidden">
+              <Image src="/images/coins/tiktok-coin.jpeg" alt="TikTok Coin" fill className="object-cover" unoptimized />
+            </div>
+            <span>TIKTOK COIN PRICE LIST</span>
+            <div className="w-4 h-4 relative shrink-0 rounded-full overflow-hidden">
+              <Image src="/images/coins/tiktok-coin.jpeg" alt="TikTok Coin" fill className="object-cover" unoptimized />
+            </div>
+          </div>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-6">
@@ -471,7 +494,18 @@ function TikTokCoinRow({ row, gameName, whatsappNumber }: { row: GameRow; gameNa
 
   return (
     <div className="grid grid-cols-[auto_1fr_auto_auto] gap-2 items-center px-3 py-2 rounded-xl bg-white/[0.02] border border-white/[0.05] hover:bg-white/[0.05] transition-all">
-      <span className="text-base">🪙</span>
+      {/* Official TikTok Coin Photo */}
+      <div className="w-5 h-5 sm:w-6 sm:h-6 relative shrink-0 rounded-full overflow-hidden border border-[#FACC15]/40 shadow-sm">
+        <Image
+          src="/images/coins/tiktok-coin.jpeg"
+          alt="TikTok Coin"
+          fill
+          sizes="24px"
+          className="object-cover"
+          unoptimized
+        />
+      </div>
+
       <div className="flex items-center gap-2 min-w-0">
         <span className="font-bold text-white text-xs sm:text-sm">{row.amountLabel}</span>
         <div className="hidden sm:block flex-1 border-b border-dotted border-white/20 mx-1" />
@@ -492,7 +526,7 @@ function TikTokCoinRow({ row, gameName, whatsappNumber }: { row: GameRow; gameNa
 }
 
 /* =========================================================================
-   3. PUBG MOBILE LISTING (Matches PUBG Banner Grid Cards)
+   3. PUBG MOBILE LISTING (Uses Official PUBG Mobile UC Photo)
    ========================================================================= */
 function PubgListing({ game, whatsappNumber }: { game: Game; whatsappNumber: string }) {
   const group = game.groups[0];
@@ -513,7 +547,7 @@ function PubgListing({ game, whatsappNumber }: { game: Game; whatsappNumber: str
         </p>
       </div>
 
-      {/* 2x3 Glowing Cyberpunk Cards Grid (Matches PUBG Banner) */}
+      {/* 2x3 Glowing Cyberpunk Cards Grid with Official PUBG UC Photo */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
         {rows.map((row) => {
           const href = buildWhatsAppUrl({
@@ -530,9 +564,17 @@ function PubgListing({ game, whatsappNumber }: { game: Game; whatsappNumber: str
               transition={{ duration: 0.2 }}
               className="relative rounded-2xl bg-gradient-to-b from-[#141C2E] to-[#0A0E17] border-2 border-[#00E5FF]/40 shadow-[0_0_25px_rgba(0,229,255,0.12)] p-5 flex flex-col justify-between overflow-hidden group hover:border-[#00E5FF] hover:shadow-[0_0_35px_rgba(0,229,255,0.3)]"
             >
-              <div className="flex items-center justify-between gap-2">
-                <div className="w-12 h-12 rounded-xl bg-[#00E5FF]/15 border border-[#00E5FF]/40 flex items-center justify-center text-2xl shadow-inner">
-                  💎
+              <div className="flex items-center justify-between gap-3">
+                {/* Official PUBG UC Metallic Card Image */}
+                <div className="w-16 h-12 relative shrink-0 rounded-xl overflow-hidden bg-black/40 border border-[#00E5FF]/40 p-1 flex items-center justify-center shadow-inner">
+                  <Image
+                    src="/images/coins/pubg-uc-card.png"
+                    alt="PUBG Mobile UC"
+                    fill
+                    sizes="80px"
+                    className="object-contain drop-shadow-[0_0_8px_rgba(0,229,255,0.4)]"
+                    unoptimized
+                  />
                 </div>
                 <div className="text-right">
                   <div className="text-[10px] font-bold uppercase tracking-wider text-white/50">PACKAGE</div>
@@ -593,7 +635,7 @@ function PubgListing({ game, whatsappNumber }: { game: Game; whatsappNumber: str
 }
 
 /* =========================================================================
-   4. EFOOTBALL LISTING (Matches eFootball Banner)
+   4. EFOOTBALL LISTING (Uses Official 3-Stacked eFootball Coins Photo)
    ========================================================================= */
 function EFootballListing({ game, whatsappNumber }: { game: Game; whatsappNumber: string }) {
   const coinGroup = game.groups.find((g) => g.label?.toLowerCase().includes("coin")) || game.groups[0];
@@ -617,12 +659,18 @@ function EFootballListing({ game, whatsappNumber }: { game: Game; whatsappNumber
         </p>
       </div>
 
-      {/* Section 1: COIN PRICE LIST */}
+      {/* Section 1: COIN PRICE LIST with Official eFootball Coins Photo */}
       <div className="rounded-3xl bg-[#0C1222] border-2 border-[#0284C7] shadow-[0_0_40px_rgba(2,132,199,0.2)] p-5 sm:p-7">
-        <div className="text-center mb-6">
-          <span className="px-6 py-2 rounded-full bg-gradient-to-r from-[#0284C7] to-[#0369A1] text-white font-[var(--font-russo)] text-sm tracking-wider uppercase shadow-md">
-            COIN PRICE LIST
-          </span>
+        <div className="flex justify-center mb-6">
+          <div className="flex items-center gap-2.5 px-6 py-2 rounded-full bg-gradient-to-r from-[#0284C7] to-[#0369A1] text-white font-[var(--font-russo)] text-sm tracking-wider uppercase shadow-md">
+            <div className="w-5 h-5 relative shrink-0 rounded-full overflow-hidden">
+              <Image src="/images/coins/efootball-coins.jpg" alt="eFootball Coins" fill className="object-cover" unoptimized />
+            </div>
+            <span>COIN PRICE LIST</span>
+            <div className="w-5 h-5 relative shrink-0 rounded-full overflow-hidden">
+              <Image src="/images/coins/efootball-coins.jpg" alt="eFootball Coins" fill className="object-cover" unoptimized />
+            </div>
+          </div>
         </div>
 
         <div className="grid md:grid-cols-2 gap-3">
@@ -639,9 +687,16 @@ function EFootballListing({ game, whatsappNumber }: { game: Game; whatsappNumber
                 key={row.id}
                 className="grid grid-cols-[auto_1fr_auto_auto] gap-2.5 items-center px-3.5 py-2.5 rounded-xl bg-white/[0.02] border border-[#0284C7]/30 hover:bg-[#0284C7]/10 transition-all"
               >
-                {/* Yellow Coin Emblem */}
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#FACC15] to-[#CA8A04] flex items-center justify-center text-xs font-black text-black shadow-md">
-                  e
+                {/* Official eFootball Coins Photo */}
+                <div className="w-7 h-7 sm:w-8 sm:h-8 relative shrink-0 rounded-full overflow-hidden border border-[#FACC15]/60 shadow-md bg-black/40">
+                  <Image
+                    src="/images/coins/efootball-coins.jpg"
+                    alt="eFootball Coins"
+                    fill
+                    sizes="32px"
+                    className="object-cover"
+                    unoptimized
+                  />
                 </div>
 
                 <div className="font-[var(--font-russo)] text-white text-sm">
@@ -788,6 +843,7 @@ function DefaultGameListing({ game, whatsappNumber }: { game: Game; whatsappNumb
                   }`}
                 >
                   <div className="flex items-center gap-2 min-w-0">
+                    <CurrencyIcon gameSlug={game.slug} amountLabel={row.amountLabel} className="w-5 h-5" />
                     <span className="font-semibold text-white truncate text-sm">{row.amountLabel}</span>
                     {row.isHighlighted && (
                       <Badge className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-[#F43F5E] text-white border-none">

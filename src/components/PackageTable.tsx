@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import type { GameGroup, Game, GameRow } from "@/lib/types";
 import { buildWhatsAppUrl } from "@/lib/whatsapp";
 import { Badge } from "@/components/ui/badge";
+import { CurrencyIcon } from "@/components/CurrencyIcon";
 
 const rowVariants = {
   hidden: { opacity: 0, x: -10 },
@@ -51,6 +52,7 @@ export function PackageTable({ game, group, whatsappNumber }: { game: Game; grou
               }`}
             >
               <div className="flex items-center gap-2 min-w-0">
+                <CurrencyIcon gameSlug={game.slug} amountLabel={row.amountLabel} className="w-5 h-5" />
                 <span className="font-semibold text-white truncate">{row.amountLabel}</span>
                 {row.isHighlighted && (
                   <Badge className="shrink-0 text-[9px] font-black tracking-wider uppercase px-2 py-0.5 rounded-full bg-[#F43F5E] text-white hover:bg-[#F43F5E] border-none">
