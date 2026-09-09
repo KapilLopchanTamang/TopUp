@@ -18,7 +18,7 @@ export function getCurrencyIcon(gameSlug: string, amountLabel: string = ""): Cur
 
   if (slug.includes("free-fire") || slug.includes("freefire")) {
     return {
-      src: "/images/coins/free-fire-diamond.jpeg",
+      src: "/images/coins/free-fire-diamond.png",
       alt: "Free Fire Diamond",
       type: "image",
     };

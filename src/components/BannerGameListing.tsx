@@ -113,12 +113,12 @@ function FreeFireListing({ game, whatsappNumber }: { game: Game; whatsappNumber:
         {/* Section Pill with Free Fire Diamond Photo */}
         <div className="flex justify-center mb-6">
           <div className="flex items-center gap-2.5 px-6 py-2 rounded-full bg-gradient-to-r from-[#7C3AED] to-[#EC4899] text-white font-[var(--font-russo)] text-sm tracking-wider uppercase shadow-[0_0_20px_rgba(236,72,153,0.4)]">
-            <div className="w-5 h-5 relative shrink-0">
-              <Image src="/images/coins/free-fire-diamond.jpeg" alt="Free Fire Diamond" fill className="object-contain" unoptimized />
+            <div className="w-6 h-5 relative shrink-0">
+              <Image src="/images/coins/free-fire-diamond.png" alt="Free Fire Diamond" fill className="object-contain drop-shadow-[0_0_8px_rgba(0,229,255,0.6)]" unoptimized />
             </div>
             <span>DIAMOND TOPUP</span>
-            <div className="w-5 h-5 relative shrink-0">
-              <Image src="/images/coins/free-fire-diamond.jpeg" alt="Free Fire Diamond" fill className="object-contain" unoptimized />
+            <div className="w-6 h-5 relative shrink-0">
+              <Image src="/images/coins/free-fire-diamond.png" alt="Free Fire Diamond" fill className="object-contain drop-shadow-[0_0_8px_rgba(0,229,255,0.6)]" unoptimized />
             </div>
           </div>
         </div>
@@ -327,14 +327,14 @@ function DiamondItemRow({ row, gameName, whatsappNumber }: { row: GameRow; gameN
           : "bg-white/[0.02] border border-white/[0.06] hover:bg-white/[0.05]"
       }`}
     >
-      <div className="flex items-center gap-2 min-w-0">
-        <div className="w-5 h-5 relative shrink-0">
+      <div className="flex items-center gap-2.5 min-w-0">
+        <div className="w-6 h-5 relative shrink-0 flex items-center justify-center">
           <Image
-            src="/images/coins/free-fire-diamond.jpeg"
+            src="/images/coins/free-fire-diamond.png"
             alt="Free Fire Diamond"
             fill
-            sizes="20px"
-            className="object-contain drop-shadow-[0_0_6px_rgba(0,229,255,0.4)]"
+            sizes="24px"
+            className="object-contain drop-shadow-[0_0_8px_rgba(0,229,255,0.5)]"
             unoptimized
           />
         </div>
@@ -565,19 +565,19 @@ function PubgListing({ game, whatsappNumber }: { game: Game; whatsappNumber: str
               className="relative rounded-2xl bg-gradient-to-b from-[#141C2E] to-[#0A0E17] border-2 border-[#00E5FF]/40 shadow-[0_0_25px_rgba(0,229,255,0.12)] p-5 flex flex-col justify-between overflow-hidden group hover:border-[#00E5FF] hover:shadow-[0_0_35px_rgba(0,229,255,0.3)]"
             >
               <div className="flex items-center justify-between gap-3">
-                {/* Official PUBG UC Metallic Card Image */}
-                <div className="w-16 h-12 relative shrink-0 rounded-xl overflow-hidden bg-black/40 border border-[#00E5FF]/40 p-1 flex items-center justify-center shadow-inner">
+                {/* Clean Transparent PUBG UC Metallic Card */}
+                <div className="w-20 h-14 relative shrink-0 flex items-center justify-center">
                   <Image
                     src="/images/coins/pubg-uc-card.png"
                     alt="PUBG Mobile UC"
                     fill
-                    sizes="80px"
-                    className="object-contain drop-shadow-[0_0_8px_rgba(0,229,255,0.4)]"
+                    sizes="90px"
+                    className="object-contain drop-shadow-[0_4px_14px_rgba(0,229,255,0.45)] transition-transform duration-300 group-hover:scale-105"
                     unoptimized
                   />
                 </div>
                 <div className="text-right">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-white/50">PACKAGE</div>
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-[#00E5FF]/80">PACKAGE</div>
                   <div className="font-[var(--font-russo)] text-xl sm:text-2xl text-white tracking-wide">
                     {row.amountLabel}
                   </div>
