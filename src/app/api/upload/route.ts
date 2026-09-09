@@ -2,47 +2,52 @@ import { NextRequest, NextResponse } from 'next/server';
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 import { auth } from '@/lib/auth';
+import {
+  sanitizeUploadFilename,
+  validateImage,
+} from '@/lib/upload';
 
 export async function POST(request: NextRequest) {
   // Check authentication
-  const session = await auth();
-  if (!session) {
+  let session = null;
+  try {
+    session = await auth();
+  } catch {
+    session = null;
+  }
+
+  if (!session?.user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   try {
     const formData = await request.formData();
-    const file = formData.get('file') as File;
+    const file = formData.get('file');
 
-    if (!file) {
-      return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
+    if (!file || typeof file === 'string' || !('arrayBuffer' in file) || (file as Blob).size === 0) {
+      return NextResponse.json({ error: 'No file uploaded or file is empty' }, { status: 400 });
     }
 
-    // Validate file type
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-    if (!allowedTypes.includes(file.type)) {
+    const blob = file as File;
+
+    const validation = validateImage({
+      size: blob.size,
+      type: blob.type,
+      name: blob.name,
+    });
+
+    if (!validation.valid) {
+      const isSizeError = validation.error?.includes('large');
       return NextResponse.json(
-        { error: 'Invalid file type. Only JPEG, PNG, and WebP are allowed.' },
-        { status: 400 }
+        { error: validation.error },
+        { status: isSizeError ? 413 : 400 }
       );
     }
 
-    // Validate file size (5MB max)
-    const maxSize = 5 * 1024 * 1024;
-    if (file.size > maxSize) {
-      return NextResponse.json(
-        { error: 'File too large. Maximum size is 5MB.' },
-        { status: 400 }
-      );
-    }
-
-    // Generate unique filename
-    const bytes = await file.arrayBuffer();
+    const bytes = await blob.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    const timestamp = Date.now();
-    const originalName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-    const filename = `${timestamp}-${originalName}`;
+    const filename = sanitizeUploadFilename(blob.name, blob.type);
 
     // Save to public/images/uploads directory
     const uploadDir = join(process.cwd(), 'public', 'images', 'uploads');

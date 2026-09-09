@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { prisma } from "@/lib/db";
-import { deleteGame } from "@/lib/actions";
+import { DeleteGameButton } from "@/components/admin/DeleteGameButton";
 import type { Game } from "@/lib/types";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -14,7 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Gamepad2, Package, CheckCircle2, EyeOff, Plus, Edit, Trash2 } from "lucide-react";
+import { Gamepad2, Package, CheckCircle2, EyeOff, Plus, Edit } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -135,7 +135,9 @@ export default async function AdminDashboard() {
                               src={g.imageUrl}
                               alt={g.name}
                               fill
+                              sizes="48px"
                               className="object-cover"
+                              unoptimized
                             />
                           ) : (
                             <Gamepad2 className="size-5 text-white/30" />
@@ -174,16 +176,7 @@ export default async function AdminDashboard() {
                             <Edit className="mr-1 size-3.5 text-violet-400" />
                             Edit
                           </Button>
-                          <form action={deleteGame.bind(null, g.id)}>
-                            <Button
-                              size="sm"
-                              variant="destructive"
-                              className="h-8 px-2.5 text-xs font-medium bg-rose-500/15 text-rose-300 hover:bg-rose-500/25 hover:text-rose-200 border border-rose-500/20"
-                            >
-                              <Trash2 className="mr-1 size-3.5 text-rose-400" />
-                              Delete
-                            </Button>
-                          </form>
+                          <DeleteGameButton id={g.id} name={g.name} />
                         </div>
                       </TableCell>
                     </TableRow>

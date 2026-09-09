@@ -1,6 +1,6 @@
 "use server";
 import { prisma } from "./db";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 
 type RowInput = { amountLabel: string; price: string; isHighlighted?: boolean; sortOrder: number };
@@ -16,7 +16,8 @@ function sanitizeSlug(input: string): string {
 }
 
 function validatePrice(price: string): boolean {
-  const num = parseFloat(price);
+  const clean = price.replace(/[^0-9.]/g, "");
+  const num = parseFloat(clean);
   return !isNaN(num) && num > 0;
 }
 
@@ -79,6 +80,11 @@ export async function createGame(formData: FormData) {
 
   revalidatePath("/");
   revalidatePath("/games");
+  revalidatePath("/admin");
+  revalidatePath("/admin/games");
+  try {
+    revalidateTag("games", "max");
+  } catch {}
   redirect("/admin");
 }
 
@@ -90,7 +96,7 @@ export async function updateGame(id: string, formData: FormData) {
   const existing = await prisma.game.findUnique({ where: { id }, select: { imageUrl: true, slug: true } });
   if (!existing) throw new Error("Game not found");
 
-  const imageUrl = imageUrlInput || existing.imageUrl || null;
+  const imageUrl = formData.has("imageUrl") ? (imageUrlInput || null) : (existing.imageUrl || null);
 
   const sortOrder = parseInt(String(formData.get("sortOrder") || "0"), 10) || 0;
   const isActive = formData.get("isActive") === "on";
@@ -149,13 +155,61 @@ export async function updateGame(id: string, formData: FormData) {
   revalidatePath("/");
   revalidatePath("/games");
   revalidatePath(`/games/${slug}`);
+  if (existing.slug && existing.slug !== slug) {
+    revalidatePath(`/games/${existing.slug}`);
+  }
+  revalidatePath("/admin");
+  revalidatePath("/admin/games");
+  try {
+    revalidateTag("games", "max");
+  } catch {}
   redirect("/admin");
 }
 
 export async function deleteGame(id: string) {
-  await prisma.game.delete({ where: { id } });
+  if (!id) throw new Error("Game ID is required");
+
+  const existing = await prisma.game.findUnique({
+    where: { id },
+    select: { id: true, slug: true },
+  });
+
+  if (!existing) {
+    throw new Error("Game not found or already deleted");
+  }
+
+  // Safe transactional deletion of rows, groups, and game
+  await prisma.$transaction(async (tx) => {
+    const groups = await tx.packageGroup.findMany({
+      where: { gameId: id },
+      select: { id: true },
+    });
+    const groupIds = groups.map((g) => g.id);
+    if (groupIds.length > 0) {
+      await tx.packageRow.deleteMany({
+        where: { groupId: { in: groupIds } },
+      });
+    }
+    await tx.packageGroup.deleteMany({
+      where: { gameId: id },
+    });
+    await tx.game.delete({
+      where: { id },
+    });
+  });
+
+  revalidatePath("/admin");
+  revalidatePath("/admin/games");
   revalidatePath("/");
   revalidatePath("/games");
+  if (existing.slug) {
+    revalidatePath(`/games/${existing.slug}`);
+  }
+  try {
+    revalidateTag("games", "max");
+  } catch {}
+
+  return { success: true };
 }
 
 export async function updateSettings(formData: FormData) {
@@ -174,5 +228,10 @@ export async function updateSettings(formData: FormData) {
   revalidatePath("/");
   revalidatePath("/payment-methods");
   revalidatePath("/contact");
+  revalidatePath("/admin");
+  revalidatePath("/admin/settings");
+  try {
+    revalidateTag("settings", "max");
+  } catch {}
   redirect("/admin");
 }

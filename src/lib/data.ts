@@ -1,3 +1,5 @@
+import { cache } from "react";
+import { unstable_cache } from "next/cache";
 import { prisma } from "./db";
 import { seedGames, defaultSettings, type SeedGame } from "./seed-data";
 import type { Game, SiteSettings } from "./types";
@@ -33,44 +35,81 @@ function seedToGame(g: SeedGame): Game {
   };
 }
 
-export async function getSettings(): Promise<SiteSettings> {
-  try {
-    const s = await prisma.siteSettings.findUnique({ where: { id: 1 } });
-    if (s) return s;
-  } catch (error) {
-    console.error("Database error in getSettings:", error);
-  }
-  return { id: 1, ...defaultSettings };
-}
+const REVALIDATE_TIME = process.env.NODE_ENV === "development" ? 1 : 3600;
 
-export async function getGames(): Promise<Game[]> {
-  try {
-    const games = await prisma.game.findMany({
-      where: { isActive: true },
-      include: { groups: { include: { rows: { orderBy: { sortOrder: "asc" } } }, orderBy: { sortOrder: "asc" } } },
-      orderBy: { sortOrder: "asc" },
-    });
-    if (games.length > 0) return games as unknown as Game[];
-  } catch (error) {
-    console.error("Database error in getGames:", error);
-  }
-  return seedGames.map((g) => seedToGame(g));
-}
+const fetchSettingsFromDb = unstable_cache(
+  async (): Promise<SiteSettings> => {
+    try {
+      const s = await prisma.siteSettings.findUnique({ where: { id: 1 } });
+      if (s) return s;
+    } catch (error) {
+      console.error("Database error in getSettings:", error);
+    }
+    return { id: 1, ...defaultSettings };
+  },
+  ["site-settings"],
+  { tags: ["settings"], revalidate: REVALIDATE_TIME }
+);
 
-export async function getGameBySlug(slug: string): Promise<Game | null> {
-  try {
-    const game = await prisma.game.findUnique({
-      where: { slug },
-      include: { groups: { include: { rows: { orderBy: { sortOrder: "asc" } } }, orderBy: { sortOrder: "asc" } } },
-    });
-    if (game) return game as unknown as Game;
-  } catch (error) {
-    console.error("Database error in getGameBySlug:", error);
-  }
-  const seed = seedGames.find((g) => g.slug === slug);
-  if (!seed) return null;
-  return seedToGame(seed);
-}
+export const getSettings = cache(async (): Promise<SiteSettings> => {
+  return await fetchSettingsFromDb();
+});
+
+const fetchGamesFromDb = unstable_cache(
+  async (): Promise<Game[]> => {
+    try {
+      const games = await prisma.game.findMany({
+        where: { isActive: true },
+        include: {
+          groups: {
+            include: { rows: { orderBy: { sortOrder: "asc" } } },
+            orderBy: { sortOrder: "asc" },
+          },
+        },
+        orderBy: { sortOrder: "asc" },
+      });
+      if (games.length > 0) return games as unknown as Game[];
+    } catch (error) {
+      console.error("Database error in getGames:", error);
+    }
+    return seedGames.map((g) => seedToGame(g));
+  },
+  ["storefront-games"],
+  { tags: ["games"], revalidate: REVALIDATE_TIME }
+);
+
+export const getGames = cache(async (): Promise<Game[]> => {
+  return await fetchGamesFromDb();
+});
+
+const fetchGameBySlugFromDb = (slug: string) =>
+  unstable_cache(
+    async (): Promise<Game | null> => {
+      try {
+        const game = await prisma.game.findUnique({
+          where: { slug },
+          include: {
+            groups: {
+              include: { rows: { orderBy: { sortOrder: "asc" } } },
+              orderBy: { sortOrder: "asc" },
+            },
+          },
+        });
+        if (game) return game as unknown as Game;
+      } catch (error) {
+        console.error("Database error in getGameBySlug:", error);
+      }
+      const seed = seedGames.find((g) => g.slug === slug);
+      if (!seed) return null;
+      return seedToGame(seed);
+    },
+    [`game-slug-${slug}`],
+    { tags: ["games", `game-${slug}`], revalidate: REVALIDATE_TIME }
+  )();
+
+export const getGameBySlug = cache(async (slug: string): Promise<Game | null> => {
+  return await fetchGameBySlugFromDb(slug);
+});
 
 export function whatsappLink(number: string, gameName: string, amountLabel: string, price: string) {
   const text = encodeURIComponent(`Hi! I want to order: ${gameName} – ${amountLabel} (Rs. ${price}). Please confirm.`);

@@ -1,34 +1,82 @@
 "use client";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import type { Game } from "@/lib/types";
 
-type Row = { amountLabel: string; price: string; isHighlighted: boolean; sortOrder: number };
-type Group = { label: string; sortOrder: number; rows: Row[] };
+type Row = { _key: string; amountLabel: string; price: string; isHighlighted: boolean; sortOrder: number };
+type Group = { _key: string; label: string; sortOrder: number; rows: Row[] };
+
+function genKey(): string {
+  return Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
+}
+
+const PRESET_IMAGES = [
+  { label: "Free Fire", url: "/images/games/free-fire.jpeg" },
+  { label: "PUBG Mobile", url: "/images/games/pubg-mobile.jpg" },
+  { label: "eFootball", url: "/images/games/efootball.jpeg" },
+  { label: "TikTok", url: "/images/games/tiktok.jpeg" },
+  { label: "Netflix", url: "/images/games/netflix.png" },
+];
+
+import {
+  ALLOWED_MIME_TYPES as ALLOWED_MIME,
+  ALLOWED_EXTENSIONS as ALLOWED_EXT,
+  MAX_FILE_SIZE as MAX_SIZE,
+} from "@/lib/upload";
 
 export function GameForm({ initial, action }: { initial?: Game; action: (fd: FormData) => Promise<void> }) {
-  const [groups, setGroups] = useState<Group[]>(
-    initial?.groups?.map((g) => ({
-      label: g.label || "",
-      sortOrder: g.sortOrder,
-      rows: g.rows.map((r) => ({
-        amountLabel: r.amountLabel,
-        price: r.price,
-        isHighlighted: r.isHighlighted,
-        sortOrder: r.sortOrder,
-      })),
-    })) || [{ label: "Default", sortOrder: 0, rows: [{ amountLabel: "", price: "", isHighlighted: false, sortOrder: 0 }] }]
-  );
+  const [groups, setGroups] = useState<Group[]>(() => {
+    if (initial?.groups && initial.groups.length > 0) {
+      return initial.groups.map((g) => ({
+        _key: g.id || genKey(),
+        label: g.label || "",
+        sortOrder: g.sortOrder,
+        rows: g.rows.map((r) => ({
+          _key: r.id || genKey(),
+          amountLabel: r.amountLabel,
+          price: r.price,
+          isHighlighted: r.isHighlighted,
+          sortOrder: r.sortOrder,
+        })),
+      }));
+    }
+    return [
+      {
+        _key: genKey(),
+        label: "Default",
+        sortOrder: 0,
+        rows: [{ _key: genKey(), amountLabel: "", price: "", isHighlighted: false, sortOrder: 0 }],
+      },
+    ];
+  });
   const [imageUrl, setImageUrl] = useState<string>(initial?.imageUrl || "");
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string>("");
+  const [uploadSuccess, setUploadSuccess] = useState<string>("");
+  const [isDragging, setIsDragging] = useState(false);
+  const [imgLoadError, setImgLoadError] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  async function processFile(file: File) {
+    setUploadError("");
+    setUploadSuccess("");
+    setImgLoadError(false);
+
+    // Client-side validation
+    if (file.size > MAX_SIZE) {
+      setUploadError("File is too large. Maximum size is 5MB.");
+      return;
+    }
+
+    const ext = file.name.includes('.') ? file.name.slice(file.name.lastIndexOf('.')).toLowerCase() : '';
+    const cleanType = (file.type || '').toLowerCase().split(';')[0].trim();
+
+    if (!ALLOWED_MIME.includes(cleanType) && !ALLOWED_EXT.includes(ext)) {
+      setUploadError("Invalid file type. Only JPEG, PNG, and WebP are allowed.");
+      return;
+    }
 
     setUploading(true);
-    setUploadError("");
 
     try {
       const formData = new FormData();
@@ -46,28 +94,142 @@ export function GameForm({ initial, action }: { initial?: Game; action: (fd: For
       }
 
       setImageUrl(data.imageUrl);
+      setUploadSuccess("Photo uploaded successfully!");
     } catch (error) {
       setUploadError(error instanceof Error ? error.message : 'Failed to upload image');
     } finally {
       setUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  }
+
+  function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (file) {
+      processFile(file);
+    }
+  }
+
+  function handleDragOver(e: React.DragEvent) {
+    e.preventDefault();
+    setIsDragging(true);
+  }
+
+  function handleDragLeave(e: React.DragEvent) {
+    e.preventDefault();
+    setIsDragging(false);
+  }
+
+  function handleDrop(e: React.DragEvent) {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      processFile(file);
     }
   }
 
   function addGroup() {
-    setGroups([...groups, { label: "", sortOrder: groups.length, rows: [{ amountLabel: "", price: "", isHighlighted: false, sortOrder: 0 }] }]);
+    setGroups((prev) => [
+      ...prev,
+      {
+        _key: genKey(),
+        label: "",
+        sortOrder: prev.length,
+        rows: [{ _key: genKey(), amountLabel: "", price: "", isHighlighted: false, sortOrder: 0 }],
+      },
+    ]);
   }
-  function removeGroup(i: number) {
-    setGroups(groups.filter((_, idx) => idx !== i));
+
+  function removeGroup(gi: number) {
+    if (groups.length <= 1) {
+      setGroups([
+        {
+          _key: genKey(),
+          label: "",
+          sortOrder: 0,
+          rows: [{ _key: genKey(), amountLabel: "", price: "", isHighlighted: false, sortOrder: 0 }],
+        },
+      ]);
+      return;
+    }
+    setGroups((prev) => prev.filter((_, idx) => idx !== gi));
   }
+
   function addRow(gi: number) {
-    const c = [...groups];
-    c[gi].rows.push({ amountLabel: "", price: "", isHighlighted: false, sortOrder: c[gi].rows.length });
-    setGroups(c);
+    setGroups((prev) =>
+      prev.map((g, idx) => {
+        if (idx !== gi) return g;
+        return {
+          ...g,
+          rows: [
+            ...g.rows,
+            { _key: genKey(), amountLabel: "", price: "", isHighlighted: false, sortOrder: g.rows.length },
+          ],
+        };
+      })
+    );
   }
+
   function removeRow(gi: number, ri: number) {
-    const c = [...groups];
-    c[gi].rows = c[gi].rows.filter((_, idx) => idx !== ri);
-    setGroups(c);
+    setGroups((prev) =>
+      prev.map((g, gIdx) => {
+        if (gIdx !== gi) return g;
+        const newRows = g.rows.filter((_, rIdx) => rIdx !== ri);
+        return {
+          ...g,
+          rows:
+            newRows.length > 0
+              ? newRows
+              : [{ _key: genKey(), amountLabel: "", price: "", isHighlighted: false, sortOrder: 0 }],
+        };
+      })
+    );
+  }
+
+  function updateGroupLabel(gi: number, label: string) {
+    setGroups((prev) =>
+      prev.map((g, idx) => (idx === gi ? { ...g, label } : g))
+    );
+  }
+
+  function updateRowAmount(gi: number, ri: number, amountLabel: string) {
+    setGroups((prev) =>
+      prev.map((g, gIdx) => {
+        if (gIdx !== gi) return g;
+        return {
+          ...g,
+          rows: g.rows.map((r, rIdx) => (rIdx === ri ? { ...r, amountLabel } : r)),
+        };
+      })
+    );
+  }
+
+  function updateRowPrice(gi: number, ri: number, price: string) {
+    setGroups((prev) =>
+      prev.map((g, gIdx) => {
+        if (gIdx !== gi) return g;
+        return {
+          ...g,
+          rows: g.rows.map((r, rIdx) => (rIdx === ri ? { ...r, price } : r)),
+        };
+      })
+    );
+  }
+
+  function updateRowHighlight(gi: number, ri: number, isHighlighted: boolean) {
+    setGroups((prev) =>
+      prev.map((g, gIdx) => {
+        if (gIdx !== gi) return g;
+        return {
+          ...g,
+          rows: g.rows.map((r, rIdx) => (rIdx === ri ? { ...r, isHighlighted } : r)),
+        };
+      })
+    );
   }
 
   const fieldCls = "mt-1 w-full rounded-xl bg-white/[0.06] border border-white/10 px-3 py-2.5 text-sm outline-none focus:border-violet-500/60 focus:bg-white/[0.08] transition-colors placeholder:text-white/30";
@@ -98,11 +260,40 @@ export function GameForm({ initial, action }: { initial?: Game; action: (fd: For
         </div>
 
         <div>
-          <label className="text-sm font-semibold block mb-2">
-            Game Image <span className="text-red-400">*</span>
-          </label>
+          <div className="flex items-center justify-between mb-2">
+            <label className="text-sm font-semibold">
+              Game Image
+              <span className="text-white/40 text-xs font-normal ml-2">(Upload photo or provide path)</span>
+            </label>
+          </div>
 
           <div className="space-y-3">
+            {/* Quick preset selector */}
+            <div>
+              <div className="text-xs text-white/50 mb-1.5 font-medium">Quick Presets:</div>
+              <div className="flex flex-wrap gap-2">
+                {PRESET_IMAGES.map((p) => (
+                  <button
+                    key={p.url}
+                    type="button"
+                    onClick={() => {
+                      setImageUrl(p.url);
+                      setUploadError("");
+                      setUploadSuccess(`Selected ${p.label}`);
+                      setImgLoadError(false);
+                    }}
+                    className={`text-xs px-2.5 py-1 rounded-lg border transition-colors ${
+                      imageUrl === p.url
+                        ? "bg-violet-600/30 border-violet-500 text-violet-200 font-semibold"
+                        : "bg-white/[0.04] border-white/10 text-white/60 hover:bg-white/[0.08] hover:text-white"
+                    }`}
+                  >
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Direct URL input option */}
             <div>
               <label className="text-xs text-white/60 mb-1 block">Image Path or URL</label>
@@ -110,49 +301,92 @@ export function GameForm({ initial, action }: { initial?: Game; action: (fd: For
                 type="text"
                 placeholder="/images/games/free-fire.jpeg or https://..."
                 value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
+                onChange={(e) => {
+                  setImageUrl(e.target.value);
+                  setImgLoadError(false);
+                  setUploadSuccess("");
+                }}
                 className={fieldCls}
               />
             </div>
 
-            {/* File Upload */}
-            <div className="text-xs text-white/40 text-center uppercase tracking-wider my-1">or upload file</div>
-            <label className="cursor-pointer block">
-              <div className="px-4 py-3 rounded-xl bg-violet-600/15 border-2 border-dashed border-violet-500/30 hover:border-violet-500/50 transition-colors text-center">
-                <div className="text-violet-300 font-semibold text-sm">
-                  {uploading ? '📤 Uploading...' : '📁 Click to upload image'}
-                </div>
-                <div className="text-white/40 text-xs mt-1">
-                  JPEG, PNG, or WebP (max 5MB)
-                </div>
+            {/* File Upload with Drag & Drop */}
+            <div className="text-xs text-white/40 text-center uppercase tracking-wider my-1">or upload photo</div>
+            <div
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              onClick={() => fileInputRef.current?.click()}
+              className={`px-4 py-4 rounded-xl border-2 border-dashed transition-all text-center cursor-pointer select-none ${
+                isDragging
+                  ? "bg-violet-600/25 border-violet-400 ring-2 ring-violet-400/40"
+                  : "bg-violet-600/10 border-violet-500/30 hover:border-violet-500/60 hover:bg-violet-600/15"
+              }`}
+            >
+              <div className="text-violet-300 font-semibold text-sm">
+                {uploading ? '📤 Uploading photo...' : isDragging ? '📥 Drop photo here' : '📁 Click or drop photo here to upload'}
+              </div>
+              <div className="text-white/40 text-xs mt-1">
+                JPEG, PNG, or WebP (max 5MB)
               </div>
               <input
+                ref={fileInputRef}
                 type="file"
                 accept="image/jpeg,image/jpg,image/png,image/webp"
                 onChange={handleFileUpload}
                 disabled={uploading}
                 className="hidden"
               />
-            </label>
+            </div>
 
             {uploadError && (
-              <div className="text-red-400 text-xs bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
-                ❌ {uploadError}
+              <div className="text-red-400 text-xs bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2 flex items-center gap-2">
+                <span>❌</span>
+                <span>{uploadError}</span>
+              </div>
+            )}
+
+            {uploadSuccess && (
+              <div className="text-emerald-400 text-xs bg-emerald-500/10 border border-emerald-500/20 rounded-lg px-3 py-2 flex items-center gap-2">
+                <span>✓</span>
+                <span>{uploadSuccess}</span>
               </div>
             )}
 
             {imageUrl && (
               <div className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.06] border border-white/10">
-                <div className="w-20 h-20 rounded-lg overflow-hidden bg-white/[0.06] border border-white/10 relative shrink-0">
-                  <Image src={imageUrl} alt="Preview" fill className="object-cover" />
+                <div className="w-20 h-20 rounded-lg overflow-hidden bg-white/[0.06] border border-white/10 relative shrink-0 grid place-items-center">
+                  {!imgLoadError ? (
+                    <Image
+                      src={imageUrl}
+                      alt="Preview"
+                      fill
+                      sizes="80px"
+                      className="object-cover"
+                      unoptimized
+                      onError={() => setImgLoadError(true)}
+                    />
+                  ) : (
+                    <span className="text-[10px] text-red-400 text-center px-1">Failed to load</span>
+                  )}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="text-xs font-semibold text-white/80 mb-1">Current Image</div>
-                  <div className="text-xs text-white/50 truncate">{imageUrl}</div>
+                  <div className="text-xs text-white/50 truncate font-mono">{imageUrl}</div>
+                  {imgLoadError && (
+                    <div className="text-[11px] text-amber-400 mt-1">
+                      ⚠️ Could not preview image at this URL. Please verify the URL or upload a new photo.
+                    </div>
+                  )}
                 </div>
                 <button
                   type="button"
-                  onClick={() => setImageUrl('')}
+                  onClick={() => {
+                    setImageUrl('');
+                    setUploadSuccess("");
+                    setUploadError("");
+                    setImgLoadError(false);
+                  }}
                   className="text-xs px-3 py-1.5 rounded-lg bg-red-500/15 text-red-300 border border-red-500/20 hover:bg-red-500/25 transition-colors shrink-0"
                 >
                   Remove
@@ -176,7 +410,22 @@ export function GameForm({ initial, action }: { initial?: Game; action: (fd: For
         </div>
       </div>
 
-      <input type="hidden" name="groupsJson" value={JSON.stringify(groups)} />
+      <input
+        type="hidden"
+        name="groupsJson"
+        value={JSON.stringify(
+          groups.map((g, gi) => ({
+            label: g.label || null,
+            sortOrder: gi,
+            rows: g.rows.map((r, ri) => ({
+              amountLabel: r.amountLabel,
+              price: r.price,
+              isHighlighted: !!r.isHighlighted,
+              sortOrder: ri,
+            })),
+          }))
+        )}
+      />
 
       {/* Package groups */}
       <div className="space-y-4">
@@ -195,16 +444,12 @@ export function GameForm({ initial, action }: { initial?: Game; action: (fd: For
         </div>
 
         {groups.map((g, gi) => (
-          <div key={gi} className="rounded-2xl bg-[#0E1220] border border-white/[0.06] p-4 space-y-3">
+          <div key={g._key} className="rounded-2xl bg-[#0E1220] border border-white/[0.06] p-4 space-y-3">
             <div className="flex gap-3 items-center">
               <span className="w-6 h-6 rounded-full bg-violet-600/30 text-violet-300 text-xs font-bold grid place-items-center shrink-0">{gi + 1}</span>
               <input
                 value={g.label}
-                onChange={(e) => {
-                  const c = [...groups];
-                  c[gi].label = e.target.value;
-                  setGroups(c);
-                }}
+                onChange={(e) => updateGroupLabel(gi, e.target.value)}
                 placeholder="Group label (e.g. Diamonds)"
                 className="flex-1 rounded-xl bg-white/[0.06] border border-white/10 px-3 py-2 text-sm outline-none focus:border-violet-500/60 transition-colors"
               />
@@ -225,16 +470,12 @@ export function GameForm({ initial, action }: { initial?: Game; action: (fd: For
                 <span />
               </div>
               {g.rows.map((r, ri) => (
-                <div key={ri} className="grid grid-cols-[1fr_110px_80px_32px] gap-2 items-center">
+                <div key={r._key} className="grid grid-cols-[1fr_110px_80px_32px] gap-2 items-center">
                   <label className="sr-only" htmlFor={`amount-${gi}-${ri}`}>Amount for group {gi + 1}, row {ri + 1}</label>
                   <input
                     id={`amount-${gi}-${ri}`}
                     value={r.amountLabel}
-                    onChange={(e) => {
-                      const c = [...groups];
-                      c[gi].rows[ri].amountLabel = e.target.value;
-                      setGroups(c);
-                    }}
+                    onChange={(e) => updateRowAmount(gi, ri, e.target.value)}
                     placeholder="115 💎"
                     required
                     className="rounded-xl bg-white/[0.06] border border-white/10 px-3 py-2 text-sm outline-none focus:border-violet-500/60 transition-colors"
@@ -243,11 +484,7 @@ export function GameForm({ initial, action }: { initial?: Game; action: (fd: For
                   <input
                     id={`price-${gi}-${ri}`}
                     value={r.price}
-                    onChange={(e) => {
-                      const c = [...groups];
-                      c[gi].rows[ri].price = e.target.value;
-                      setGroups(c);
-                    }}
+                    onChange={(e) => updateRowPrice(gi, ri, e.target.value)}
                     placeholder="380"
                     required
                     type="number"
@@ -259,11 +496,7 @@ export function GameForm({ initial, action }: { initial?: Game; action: (fd: For
                     <input
                       type="checkbox"
                       checked={r.isHighlighted}
-                      onChange={(e) => {
-                        const c = [...groups];
-                        c[gi].rows[ri].isHighlighted = e.target.checked;
-                        setGroups(c);
-                      }}
+                      onChange={(e) => updateRowHighlight(gi, ri, e.target.checked)}
                       className="w-3.5 h-3.5 accent-violet-500"
                       aria-label={`Mark as best deal for group ${gi + 1}, row ${ri + 1}`}
                     />

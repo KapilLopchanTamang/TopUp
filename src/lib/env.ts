@@ -11,7 +11,8 @@ const DEV_SECRET = 'dev-secret-change-in-production-32chars!!';
 
 function validateEnv() {
   const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build';
-  if (isBuildPhase) return;
+  const isTest = process.env.NODE_ENV === 'test' || process.env.npm_lifecycle_event === 'test';
+  if (isBuildPhase || isTest) return;
 
   const missing = REQUIRED_VARS.filter((v) => {
     if (v === 'ADMIN_PASSWORD') {

@@ -30,6 +30,50 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       suppressHydrationWarning
       className={cn("dark antialiased", russo.variable, chakra.variable, "font-sans", geist.variable)}
     >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var origError = console.error;
+                  console.error = function() {
+                    var args = Array.prototype.slice.call(arguments);
+                    var msg = args.map(function(a) { return typeof a === 'string' ? a : (a && a.message ? a.message : ''); }).join(' ');
+                    if (msg.indexOf('bis_skin_checked') !== -1) return;
+                    origError.apply(console, args);
+                  };
+                  var o = Element.prototype.setAttribute;
+                  Element.prototype.setAttribute = function(k, v) {
+                    if (k === 'bis_skin_checked') return;
+                    return o.apply(this, arguments);
+                  };
+                  function clean(node) {
+                    if (node && node.nodeType === 1) {
+                      if (node.hasAttribute('bis_skin_checked')) node.removeAttribute('bis_skin_checked');
+                      var els = node.querySelectorAll ? node.querySelectorAll('[bis_skin_checked]') : [];
+                      for (var i = 0; i < els.length; i++) els[i].removeAttribute('bis_skin_checked');
+                    }
+                  }
+                  if (typeof MutationObserver !== 'undefined' && document.documentElement) {
+                    var observer = new MutationObserver(function(mutations) {
+                      for (var i = 0; i < mutations.length; i++) {
+                        var m = mutations[i];
+                        if (m.type === 'attributes' && m.attributeName === 'bis_skin_checked') {
+                          m.target.removeAttribute('bis_skin_checked');
+                        } else if (m.type === 'childList') {
+                          for (var j = 0; j < m.addedNodes.length; j++) clean(m.addedNodes[j]);
+                        }
+                      }
+                    });
+                    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['bis_skin_checked'], childList: true, subtree: true });
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
+      </head>
       <body
         suppressHydrationWarning
         className="min-h-screen bg-background text-foreground flex flex-col font-[var(--font-chakra)]"

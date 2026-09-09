@@ -14,12 +14,8 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       // Allow local development
       { protocol: "http", hostname: "localhost" },
-      // Allow specific domains for game images
-      { protocol: "https", hostname: "sf-tb-sg.ibytedtos.com" }, // TikTok CDN
-      { protocol: "https", hostname: "cdn.akamai.steamstatic.com" }, // Steam CDN
-      { protocol: "https", hostname: "cdn.mobygames.com" }, // MobyGames CDN
-      { protocol: "https", hostname: "*.cloudfront.net" }, // CloudFront
-      { protocol: "https", hostname: "*.vercel.app" }, // Vercel deployments
+      // Allow any HTTPS image sources (e.g. CDNs, Supabase, Discord, custom URLs)
+      { protocol: "https", hostname: "**" },
     ],
   },
   async headers() {

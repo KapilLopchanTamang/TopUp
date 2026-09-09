@@ -1,5 +1,5 @@
 import { getGameBySlug, getSettings } from "@/lib/data";
-import { PackageTable } from "@/components/PackageTable";
+import { BannerGameListing } from "@/components/BannerGameListing";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
@@ -38,7 +38,7 @@ export default async function GameDetail({ params }: { params: Promise<{ slug: s
       <div className="mt-4 rounded-[24px] overflow-hidden border border-white/[0.08] bg-gradient-to-br from-[#7C3AED]/20 via-[#1A1A33] to-[#F43F5E]/10 p-[1px]">
         <div className="rounded-[23px] bg-[#0F0F23] p-5 sm:p-6 flex gap-4 items-center">
           <div className="w-20 h-20 rounded-2xl overflow-hidden bg-white/[0.06] border border-white/10 shrink-0 relative">
-            {game.imageUrl ? <Image src={game.imageUrl} alt="" fill className="object-cover" unoptimized /> : null}
+            {game.imageUrl ? <Image src={game.imageUrl} alt={game.name} fill sizes="80px" priority className="object-cover" unoptimized /> : null}
           </div>
           <div className="flex-1 min-w-0">
             <h1 className="font-[var(--font-russo)] text-xl sm:text-2xl tracking-wide leading-tight">{game.name}</h1>
@@ -51,10 +51,8 @@ export default async function GameDetail({ params }: { params: Promise<{ slug: s
         </div>
       </div>
 
-      <div className="mt-6 grid lg:grid-cols-2 gap-4">
-        {game.groups.map((grp) => (
-          <PackageTable key={grp.id} game={game} group={grp} whatsappNumber={settings.whatsappNumber} />
-        ))}
+      <div className="mt-8">
+        <BannerGameListing game={game} whatsappNumber={settings.whatsappNumber} />
       </div>
 
       <div className="mt-6 rounded-2xl bg-[#F43F5E]/10 border border-[#F43F5E]/20 p-4 text-sm text-[#FECDD3] leading-relaxed">

@@ -111,6 +111,8 @@ export function LoginForm({
               src="/images/games/free-fire.jpeg"
               alt="ARG TopUp Gaming"
               fill
+              priority
+              sizes="(max-width: 768px) 100vw, 50vw"
               className="object-cover opacity-60"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#0E1220] via-transparent to-transparent" />
