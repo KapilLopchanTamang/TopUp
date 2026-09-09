@@ -5,7 +5,7 @@ on:
     branches:
       - main
   schedule:
-    - cron: '0 */6 * * *'
+    - cron: '*/15 * * * *'
   workflow_dispatch:
 
 permissions:
@@ -18,12 +18,21 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
-          ref: main
           fetch-depth: 0
 
-      - name: Sync with Upstream
-        id: sync_step
-        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+      # When running in Kapil's upstream repository (KapilLopchanTamang/TopUp)
+      - name: Sync from Upstream to Prasanga Fork
+        if: github.repository == 'KapilLopchanTamang/TopUp' && github.event_name == 'push'
+        run: |
+          echo "Pushing latest main commit from Kapil repository to prasangapokharel/TopUp..."
+          git remote add fork https://x-access-token:${{ secrets.FORK_SYNC_TOKEN }}@github.com/prasangapokharel/TopUp.git || true
+          git push fork main:main
+          echo "Successfully synced to prasangapokharel/TopUp!"
+
+      # When running in Prasanga's fork (prasangapokharel/TopUp) on schedule or manual run
+      - name: Pull from Upstream
+        id: fork_pull
+        if: github.repository == 'prasangapokharel/TopUp' && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch')
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -43,10 +52,13 @@ jobs:
             echo "synced=false" >> "$GITHUB_OUTPUT"
           fi
 
+      # Trigger Vercel Production Deploy Hook
       - name: Trigger Vercel Production Deploy Hook
-        if: github.event_name == 'push' || steps.sync_step.outputs.synced == 'true' || github.event_name == 'workflow_dispatch'
+        if: |
+          (github.repository == 'KapilLopchanTamang/TopUp' && github.event_name == 'push') ||
+          (github.repository == 'prasangapokharel/TopUp' && (github.event_name == 'push' || steps.fork_pull.outputs.synced == 'true' || github.event_name == 'workflow_dispatch'))
         run: |
-          echo "Triggering Vercel deploy hook for godsupercell1-gmailcoms-projects..."
+          echo "Triggering Vercel production deploy hook for godsupercell1-gmailcoms-projects..."
           HOOK_URL="${{ secrets.VERCEL_DEPLOY_HOOK || 'https://api.vercel.com/v1/integrations/deploy/prj_HUV8aE6qWIAnDHHYw7kVnQh9gDNA/YYVQFUcgYf' }}"
           
           RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "$HOOK_URL")
