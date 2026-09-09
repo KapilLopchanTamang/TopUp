@@ -144,13 +144,24 @@ export async function updateGame(id: string, formData: FormData) {
             groupId: group.id,
             amountLabel: r.amountLabel,
             price: r.price,
-            isHighlighted: !!r.isHighlighted,
+            isHighlighted: r.isHighlighted || false,
             sortOrder: r.sortOrder,
           },
         });
       }
     }
   });
+
+  // Clean up previous uploaded image if it was replaced
+  if (existing.imageUrl && existing.imageUrl !== imageUrl && existing.imageUrl.startsWith('/api/images/')) {
+    const oldImgId = existing.imageUrl.replace('/api/images/', '');
+    if (oldImgId) {
+      try {
+        await prisma.uploadedImage.delete({ where: { id: oldImgId } });
+      } catch {}
+    }
+  }
+
 
   revalidatePath("/");
   revalidatePath("/games");
@@ -171,7 +182,7 @@ export async function deleteGame(id: string) {
 
   const existing = await prisma.game.findUnique({
     where: { id },
-    select: { id: true, slug: true },
+    select: { id: true, slug: true, imageUrl: true },
   });
 
   if (!existing) {
@@ -197,6 +208,17 @@ export async function deleteGame(id: string) {
       where: { id },
     });
   });
+
+  // Clean up uploaded image if it was stored in the database
+  if (existing.imageUrl?.startsWith('/api/images/')) {
+    const imgId = existing.imageUrl.replace('/api/images/', '');
+    if (imgId) {
+      try {
+        await prisma.uploadedImage.delete({ where: { id: imgId } });
+      } catch {}
+    }
+  }
+
 
   revalidatePath("/admin");
   revalidatePath("/admin/games");

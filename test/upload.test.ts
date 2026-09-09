@@ -137,4 +137,27 @@ describe("Admin Photo Upload Validation & Security Tests", () => {
       assert.equal(json.error, "Unauthorized");
     });
   });
+
+  describe("GET /api/images/[id] route handler", () => {
+    test("returns 404 for nonexistent image id", async () => {
+      const { GET } = await import("../src/app/api/images/[id]/route");
+      const req = new NextRequest("http://localhost:3000/api/images/nonexistent-id-12345");
+      const response = await GET(req, {
+        params: Promise.resolve({ id: "nonexistent-id-12345" }),
+      });
+      assert.equal(response.status, 404);
+    });
+
+    test("HEAD returns 404 for nonexistent image id", async () => {
+      const { HEAD } = await import("../src/app/api/images/[id]/route");
+      const req = new NextRequest("http://localhost:3000/api/images/nonexistent-id-12345", {
+        method: "HEAD",
+      });
+      const response = await HEAD(req, {
+        params: Promise.resolve({ id: "nonexistent-id-12345" }),
+      });
+      assert.equal(response.status, 404);
+    });
+  });
 });
+

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 import { auth } from '@/lib/auth';
+import { prisma } from '@/lib/db';
 import {
   sanitizeUploadFilename,
   validateImage,
@@ -45,26 +46,73 @@ export async function POST(request: NextRequest) {
     }
 
     const bytes = await blob.arrayBuffer();
-    const buffer = Buffer.from(bytes);
+    let buffer = Buffer.from(bytes);
+    let mimeType = blob.type || 'image/jpeg';
 
-    const filename = sanitizeUploadFilename(blob.name, blob.type);
+    // Optional image optimization using sharp if available
+    try {
+      const sharpModule = await import('sharp');
+      const sharp = sharpModule.default;
+      const metadata = await sharp(buffer).metadata();
 
-    // Save to public/images/uploads directory
-    const uploadDir = join(process.cwd(), 'public', 'images', 'uploads');
-    await mkdir(uploadDir, { recursive: true });
-    const filepath = join(uploadDir, filename);
+      if ((metadata.width && metadata.width > 1200) || buffer.length > 350 * 1024) {
+        buffer = await sharp(buffer)
+          .resize({ width: 1200, height: 1200, fit: 'inside', withoutEnlargement: true })
+          .webp({ quality: 85 })
+          .toBuffer();
+        mimeType = 'image/webp';
+      }
+    } catch {
+      // sharp not installed or failed on this asset; proceed with raw buffer safely
+    }
 
-    await writeFile(filepath, buffer);
+    const filename = sanitizeUploadFilename(blob.name, mimeType);
 
-    // Return the public URL
-    const imageUrl = `/images/uploads/${filename}`;
+    let imageUrl = '';
 
-    return NextResponse.json({ imageUrl, success: true });
+    // Primary: Persist image in PostgreSQL database (works on Vercel serverless without filesystem restrictions)
+    try {
+      const dbImage = await prisma.uploadedImage.create({
+        data: {
+          filename,
+          mimeType,
+          data: buffer,
+          size: buffer.length,
+        },
+      });
+      imageUrl = `/api/images/${dbImage.id}`;
+    } catch (dbError) {
+      console.warn('Database image save failed, attempting disk fallback:', dbError);
+    }
+
+    // Secondary: Also save to disk if filesystem is writable (useful for local development)
+    try {
+      const uploadDir = join(process.cwd(), 'public', 'images', 'uploads');
+      await mkdir(uploadDir, { recursive: true });
+      const filepath = join(uploadDir, filename);
+      await writeFile(filepath, buffer);
+      if (!imageUrl) {
+        imageUrl = `/images/uploads/${filename}`;
+      }
+    } catch {
+      // Expected on Vercel serverless runtime where filesystem is read-only
+    }
+
+    if (!imageUrl) {
+      throw new Error('Failed to persist image to database or disk');
+    }
+
+    return NextResponse.json({
+      imageUrl,
+      filename,
+      success: true,
+    });
   } catch (error) {
     console.error('Upload error:', error);
     return NextResponse.json(
-      { error: 'Failed to upload file' },
+      { error: error instanceof Error ? error.message : 'Failed to upload file' },
       { status: 500 }
     );
   }
 }
+
