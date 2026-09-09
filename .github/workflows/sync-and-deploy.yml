@@ -1,0 +1,64 @@
+name: Sync Fork & Deploy to Vercel
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Sync with Upstream
+        id: sync_step
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git remote add upstream https://github.com/KapilLopchanTamang/TopUp.git || true
+          git fetch upstream main
+          
+          BEHIND_COUNT=$(git rev-list --count HEAD..upstream/main)
+          echo "Commits behind upstream: $BEHIND_COUNT"
+          
+          if [ "$BEHIND_COUNT" -gt 0 ]; then
+            echo "Syncing changes from upstream..."
+            git merge --ff-only upstream/main || git merge upstream/main -m "chore: sync fork with upstream"
+            git push origin main
+            echo "synced=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Fork is already up to date with upstream."
+            echo "synced=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Trigger Vercel Production Deploy Hook
+        if: github.event_name == 'push' || steps.sync_step.outputs.synced == 'true' || github.event_name == 'workflow_dispatch'
+        run: |
+          echo "Triggering Vercel deploy hook for godsupercell1-gmailcoms-projects..."
+          HOOK_URL="${{ secrets.VERCEL_DEPLOY_HOOK || 'https://api.vercel.com/v1/integrations/deploy/prj_HUV8aE6qWIAnDHHYw7kVnQh9gDNA/YYVQFUcgYf' }}"
+          
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "$HOOK_URL")
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          BODY=$(echo "$RESPONSE" | sed '$d')
+          
+          echo "HTTP Status Code: $HTTP_CODE"
+          echo "Response Body: $BODY"
+          
+          if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
+            echo "Deploy hook successfully triggered Vercel build!"
+          else
+            echo "Failed to trigger deploy hook (HTTP $HTTP_CODE)"
+            exit 1
+          fi

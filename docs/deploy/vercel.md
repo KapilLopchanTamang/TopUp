@@ -42,7 +42,16 @@ To seed your initial catalog of games and packages on a fresh Supabase database:
 DATABASE_URL="postgresql://..." npm run db:seed
 ```
 
-## 5. Verification Checklist
+## 5. Automated Fork Sync & Deploy Hook
+
+ARG TopUp includes a GitHub Actions workflow (`.github/workflows/sync-and-deploy.yml`) that automates production deployment:
+
+- **Push / Sync**: Triggers on any push or "Sync fork" on the `main` branch.
+- **Scheduled Sync**: Automatically checks upstream (`KapilLopchanTamang/TopUp:main`) every 6 hours and merges changes.
+- **Deploy Hook**: Dispatches a POST request to Vercel Deploy Hook (`https://api.vercel.com/v1/integrations/deploy/prj_HUV8aE6qWIAnDHHYw7kVnQh9gDNA/YYVQFUcgYf`) to trigger a production build.
+- **Manual Dispatch**: Can be run manually from the GitHub Actions tab at any time.
+
+## 6. Verification Checklist
 
 - [ ] Homepage loads with game catalog.
 - [ ] Game details route `/games/[slug]` displays packages.
@@ -50,3 +59,4 @@ DATABASE_URL="postgresql://..." npm run db:seed
 - [ ] Admin login at `/admin/login` allows authentication.
 - [ ] Unauthenticated requests to `/admin/*` redirect to `/admin/login`.
 - [ ] Static assets under `/images/*` load properly.
+
