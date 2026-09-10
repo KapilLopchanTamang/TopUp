@@ -27,81 +27,64 @@ interface GameCardProps {
   whatsappNumber: string;
 }
 
-export function GameCard({ game, whatsappNumber }: GameCardProps) {
+export function GameCard({ game }: GameCardProps) {
   const href = `/games/${game.slug}`;
-  const cleanNumber = whatsappNumber.replace(/\D/g, "");
-  const whatsapp = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(`Hi! I want to buy ${game.name} topup.`)}`;
+  const isApp = (game.category || "").toLowerCase().includes("app");
 
   return (
-    <motion.div variants={item} className="group rounded-2xl bg-[var(--surface-3)] border border-white/[0.06] overflow-hidden transition-all duration-300 hover:border-[#7C3AED]/40 hover:shadow-[0_0_30px_rgba(124,58,237,0.15)]">
-      <Link
-        href={href}
-        className="block focus-visible:outline-offset-4"
-      >
-        <motion.div
-          className="relative aspect-[16/10] overflow-hidden bg-gradient-to-br from-[#1E2636] to-[#0F131C]"
-          whileHover={{ scale: 1.05 }}
-          transition={{ duration: 0.3 }}
-        >
+    <motion.div
+      variants={item}
+      className="group rounded-2xl bg-[#141A28] border border-white/[0.08] overflow-hidden transition-all duration-200 hover:border-violet-500/50 hover:shadow-[0_4px_20px_rgba(124,58,237,0.2)] flex flex-col justify-between"
+    >
+      <Link href={href} className="block focus-visible:outline-offset-2">
+        <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#0A0D14]">
           {game.imageUrl && (
             <Image
               src={game.imageUrl}
               alt={game.name}
               fill
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-              className="object-cover"
+              sizes="(max-width: 500px) 50vw, 250px"
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
               unoptimized
             />
           )}
-          {/* Category Tag */}
-          <div className="absolute top-3 left-3 z-10">
+
+          {/* Category Badge */}
+          <div className="absolute top-2 left-2 z-10">
             <span
-              className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full backdrop-blur-md border flex items-center gap-1 ${
-                (game.category || "").toLowerCase().includes("app")
-                  ? "bg-emerald-950/75 border-emerald-500/40 text-emerald-300 shadow-[0_2px_10px_rgba(16,185,129,0.3)]"
-                  : "bg-violet-950/75 border-violet-500/40 text-violet-300 shadow-[0_2px_10px_rgba(124,58,237,0.3)]"
+              className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full backdrop-blur-md border flex items-center gap-1 shadow-md ${
+                isApp
+                  ? "bg-emerald-950/80 border-emerald-500/40 text-emerald-300"
+                  : "bg-violet-950/80 border-violet-500/40 text-violet-300"
               }`}
             >
-              <span>{(game.category || "").toLowerCase().includes("app") ? "📱" : "🎮"}</span>
-              <span>{(game.category || "").toLowerCase().includes("app") ? "App Topup" : "Gaming"}</span>
+              <span>{isApp ? "📱" : "🎮"}</span>
+              <span>{isApp ? "App" : "Game"}</span>
             </span>
           </div>
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0F131C] via-transparent to-transparent opacity-60" />
-          <div className="absolute inset-0 pointer-events-none opacity-20" style={{
-            background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.03) 2px, rgba(255,255,255,0.03) 4px)'
-          }} />
-        </motion.div>
 
+          <div className="absolute inset-0 bg-gradient-to-t from-[#141A28] via-transparent to-transparent opacity-80" />
+        </div>
 
-        <div className="p-5 pb-2">
-          <h3 className="font-[var(--font-russo)] text-lg tracking-wide text-white group-hover:text-[#A78BFA] transition-colors duration-200">
+        <div className="p-3 pb-1.5">
+          <h3 className="font-[var(--font-russo)] text-[13px] sm:text-sm tracking-wide text-white group-hover:text-violet-300 transition-colors truncate">
             {game.name}
           </h3>
-          <p className="text-xs text-white/50 mt-2 line-clamp-2">
-            Instant delivery • Secure payment • Best price in Nepal
-          </p>
+          <div className="text-[10px] text-emerald-400 font-semibold mt-0.5 flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span>Instant Topup</span>
+          </div>
         </div>
       </Link>
 
-      <div className="px-5 pb-5 pt-2 flex items-center gap-2">
+      <div className="p-2.5 pt-1">
         <Link
           href={href}
-          className="flex-1 text-center py-2.5 px-4 rounded-xl bg-[#7C3AED]/10 border border-[#7C3AED]/30 text-xs font-bold text-[#A78BFA] hover:bg-[#7C3AED]/15 hover:border-[#7C3AED]/50 transition-colors duration-200"
+          className="w-full py-2 px-2.5 rounded-xl bg-violet-600/20 hover:bg-violet-600/30 border border-violet-500/30 active:scale-95 text-violet-200 text-xs font-bold text-center flex items-center justify-center gap-1 transition-all min-h-[36px]"
         >
-          View Prices
+          <span>View Rates</span>
+          <span className="text-[11px] text-violet-400">→</span>
         </Link>
-
-        <a
-          href={whatsapp}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex-1 text-center py-2.5 px-4 rounded-xl bg-[#25D366] hover:bg-[#1ebe5a] text-white text-xs font-bold min-h-[44px] flex items-center justify-center gap-2 transition-colors duration-200"
-        >
-          <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5">
-            <path d="M12 2a10 10 0 0 0-8.6 15.2L2 22l4.9-1.3A10 10 0 1 0 12 2Zm0 2a8 8 0 0 1 6.9 12.1l-.4.7.3 1-1 .3-.7-.4A8 8 0 0 1 12 4Zm-3.2 4.2c.2 0 .4.1.5.4l.7 1.6c.1.3 0 .5-.2.7l-.6.6c-.1.1-.1.3 0 .4.3.6.8 1.1 1.4 1.4.1.1.3.1.4 0l.6-.6c.2-.2.4-.2.7-.1l1.6.7c.3.1.4.3.4.5v1c0 .3-.2.5-.5.6-1 .2-2.1 0-3.1-.6a8 8 0 0 1-2.3-2.3c-.6-1-.9-2.1-.6-3.1.1-.3.3-.5.6-.5h1Z"/>
-          </svg>
-          Buy
-        </a>
       </div>
     </motion.div>
   );
@@ -118,7 +101,7 @@ export function GameGrid({ games, whatsappNumber }: GameGridProps) {
       variants={container}
       initial="hidden"
       animate="show"
-      className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"
+      className="grid grid-cols-2 gap-2.5 sm:gap-3"
     >
       {games.map((game) => (
         <GameCard key={game.slug} game={game} whatsappNumber={whatsappNumber} />

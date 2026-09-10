@@ -52,7 +52,7 @@ export function AnimatedHomePage({ games, whatsappNumber }: AnimatedHomePageProp
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-[#0F131C] via-[#161D2B] to-[#0F131C]">
+      <section className="relative overflow-hidden bg-gradient-to-b from-[#0F131C] via-[#161D2B] to-[#0F131C] py-8 sm:py-10 px-4">
         {/* Animated glow orb */}
         <motion.div
           initial={{ opacity: 0.4, scale: 0.95 }}
@@ -65,153 +65,135 @@ export function AnimatedHomePage({ games, whatsappNumber }: AnimatedHomePageProp
             repeat: Infinity,
             ease: "easeInOut"
           }}
-          className="absolute top-20 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full bg-[#7C3AED]/20 blur-[120px] pointer-events-none"
+          className="absolute top-10 left-1/2 -translate-x-1/2 w-[350px] h-[350px] rounded-full bg-[#7C3AED]/20 blur-[90px] pointer-events-none"
           aria-hidden="true"
         />
 
-        <div className="relative z-10 max-w-[1280px] mx-auto px-4 sm:px-6 py-16 sm:py-24">
+        <div className="relative z-10 w-full text-center">
           <motion.div
             variants={heroVariants}
             initial="hidden"
             animate="visible"
-            className="text-center max-w-4xl mx-auto"
+            className="w-full"
           >
+            {/* Top Micro-badge */}
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-violet-600/20 border border-violet-500/30 text-violet-300 text-[11px] font-bold uppercase tracking-wider mb-3 shadow-[0_0_15px_rgba(124,58,237,0.3)]">
+              <span>⚡</span>
+              <span>NEPAL&apos;S #1 TOPUP STORE</span>
+            </div>
+
             {/* Hero Headline */}
             <motion.h1
-              className="font-[var(--font-russo)] text-4xl sm:text-5xl lg:text-6xl tracking-wide leading-tight"
+              className="font-[var(--font-russo)] text-3xl sm:text-4xl tracking-wide leading-tight"
               style={{
-                textShadow: "0 0 30px rgba(124,58,237,0.4), 0 0 60px rgba(124,58,237,0.2)"
+                textShadow: "0 0 25px rgba(124,58,237,0.4)"
               }}
             >
               <span className="text-white">INSTANT</span>{" "}
               <span className="bg-gradient-to-r from-[#7C3AED] via-[#A78BFA] to-[#F43F5E] bg-clip-text text-transparent">
-                GAMING TOPUP
+                TOPUP NEPAL
               </span>
             </motion.h1>
 
             <motion.p
-              className="mt-6 text-lg sm:text-xl text-white/70 max-w-2xl mx-auto leading-relaxed"
-              initial={{ opacity: 0, y: 20 }}
+              className="mt-2.5 text-xs sm:text-sm text-white/70 leading-relaxed max-w-sm mx-auto"
+              initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.6 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
             >
-              Free Fire • PUBG • TikTok • eFootball — Fast delivery, best prices in Nepal
+              Free Fire • PUBG • TikTok • eFootball • Subscriptions
             </motion.p>
 
             {/* Benefit Bullets */}
             <motion.div
-              className="mt-8 flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-sm"
+              className="mt-4 flex flex-wrap items-center justify-center gap-2 text-[11px]"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.4, duration: 0.6 }}
+              transition={{ delay: 0.3, duration: 0.5 }}
             >
               {[
                 { icon: "⚡", text: "Instant Delivery" },
                 { icon: "🔒", text: "100% Secure" },
-                { icon: "💰", text: "Best Price" }
+                { icon: "💰", text: "Best Rates" }
               ].map((item, i) => (
-                <motion.div
+                <div
                   key={i}
-                  className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.04] border border-white/10"
-                  whileHover={{ scale: 1.05, borderColor: "rgba(124,58,237,0.3)" }}
-                  transition={{ duration: 0.2 }}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.04] border border-white/10 text-white/80 font-medium"
                 >
-                  <span className="text-xl" aria-hidden="true">{item.icon}</span>
-                  <span className="text-white/80 font-medium">{item.text}</span>
-                </motion.div>
+                  <span>{item.icon}</span>
+                  <span>{item.text}</span>
+                </div>
               ))}
             </motion.div>
 
-            {/* CTA */}
+            {/* CTA Button */}
             <motion.div
-              className="mt-10"
-              initial={{ opacity: 0, scale: 0.9 }}
+              className="mt-6"
+              initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.6, duration: 0.4 }}
+              transition={{ delay: 0.4, duration: 0.3 }}
             >
-              <Link href="/games">
-                <motion.button
-                  className="inline-flex items-center gap-3 px-8 py-4 rounded-full bg-gradient-to-r from-[#7C3AED] to-[#F43F5E] text-white font-bold text-lg shadow-[0_0_40px_rgba(124,58,237,0.4)] min-h-[56px]"
-                  whileHover={{
-                    scale: 1.05,
-                    boxShadow: "0 0 60px rgba(124,58,237,0.6)"
-                  }}
-                  whileTap={{ scale: 0.95 }}
-                  transition={{ duration: 0.2 }}
+              <Link href="/games" className="block w-full">
+                <button
+                  type="button"
+                  className="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-[#7C3AED] to-[#F43F5E] text-white font-bold text-sm shadow-[0_4px_25px_rgba(124,58,237,0.4)] flex items-center justify-center gap-2 active:scale-95 transition-transform cursor-pointer"
                 >
-                  Browse All Games
-                  <svg viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
+                  <span>Browse All Topups</span>
+                  <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
                     <path fillRule="evenodd" d="M3 10a.75.75 0 0 1 .75-.75h10.638L10.23 5.29a.75.75 0 1 1 1.04-1.08l5.5 5.25a.75.75 0 0 1 0 1.08l-5.5 5.25a.75.75 0 1 1-1.04-1.08l4.158-3.96H3.75A.75.75 0 0 1 3 10Z" clipRule="evenodd" />
                   </svg>
-                </motion.button>
+                </button>
               </Link>
             </motion.div>
           </motion.div>
         </div>
-
-        {/* CRT scanlines */}
-        <div className="absolute inset-0 pointer-events-none opacity-[0.03]" style={{
-          background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.1) 2px, rgba(255,255,255,0.1) 4px)'
-        }} aria-hidden="true" />
       </section>
 
-      {/* Trust Badges */}
-      <section className="border-y border-white/[0.06] bg-[#0A0D12]">
-        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 py-8">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
-            {[
-              { label: "10K+", sub: "Happy Gamers" },
-              { label: "24/7", sub: "Support" },
-              { label: "5 Min", sub: "Avg Delivery" },
-              { label: "100%", sub: "Secure" }
-            ].map((stat, i) => (
-              <motion.div
-                key={i}
-                className="text-center"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1, duration: 0.5 }}
-              >
-                <div className="text-3xl sm:text-4xl font-[var(--font-russo)] bg-gradient-to-r from-[#A78BFA] to-[#F43F5E] bg-clip-text text-transparent">
-                  {stat.label}
-                </div>
-                <div className="text-sm text-white/50 mt-1">{stat.sub}</div>
-              </motion.div>
-            ))}
-          </div>
+      {/* Trust Stats 2x2 Grid */}
+      <section className="border-y border-white/[0.06] bg-[#0A0D12] py-4 px-3">
+        <div className="grid grid-cols-2 gap-2">
+          {[
+            { label: "10K+", sub: "Happy Gamers" },
+            { label: "24/7", sub: "Live Support" },
+            { label: "5 Min", sub: "Avg Delivery" },
+            { label: "100%", sub: "Secure & Verified" }
+          ].map((stat, i) => (
+            <div
+              key={i}
+              className="text-center p-2.5 rounded-xl bg-white/[0.02] border border-white/[0.04]"
+            >
+              <div className="text-xl sm:text-2xl font-[var(--font-russo)] bg-gradient-to-r from-[#A78BFA] to-[#F43F5E] bg-clip-text text-transparent">
+                {stat.label}
+              </div>
+              <div className="text-[10px] text-white/50 mt-0.5">{stat.sub}</div>
+            </div>
+          ))}
         </div>
       </section>
 
       {/* Games & Services Grid */}
-      <section className="bg-[#0F131C] py-16">
-        <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center"
-          >
-            <h2 className="font-[var(--font-russo)] text-3xl sm:text-4xl tracking-wide">
-              TOPUP SERVICES & GAMES
+      <section className="bg-[#0F131C] py-8 px-3.5">
+        <div>
+          <div className="text-center">
+            <h2 className="font-[var(--font-russo)] text-2xl tracking-wide text-white">
+              TOPUP SERVICES
             </h2>
-            <p className="text-white/60 mt-3 text-sm sm:text-base max-w-xl mx-auto">
-              Select Gaming Top-ups or App Subscriptions • Tap to see packages and order via WhatsApp
+            <p className="text-white/60 mt-1.5 text-xs">
+              Tap to see package rates & order via WhatsApp
             </p>
 
-            {/* Category Filter Tabs */}
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+            {/* Horizontal Scrollable Category Filter Chips */}
+            <div className="mt-4 flex items-center gap-2 overflow-x-auto pb-2 pt-1 no-scrollbar">
               <button
                 type="button"
                 onClick={() => setSelectedCategory("all")}
-                className={`px-4 py-2 rounded-full text-xs sm:text-sm font-bold border transition-all cursor-pointer ${
+                className={`shrink-0 px-3.5 py-1.5 rounded-full text-xs font-bold border transition-all cursor-pointer ${
                   selectedCategory === "all"
-                    ? "bg-white text-black border-white shadow-[0_0_20px_rgba(255,255,255,0.25)]"
-                    : "bg-white/[0.04] border-white/10 text-white/70 hover:bg-white/[0.08] hover:text-white"
+                    ? "bg-white text-black border-white shadow-[0_0_15px_rgba(255,255,255,0.3)]"
+                    : "bg-white/[0.04] border-white/10 text-white/70 hover:text-white"
                 }`}
               >
-                All Services ({games.length})
+                All ({games.length})
               </button>
 
               {categoryList.map((cat) => {
@@ -224,24 +206,24 @@ export function AnimatedHomePage({ games, whatsappNumber }: AnimatedHomePageProp
                     key={cat}
                     type="button"
                     onClick={() => setSelectedCategory(cat)}
-                    className={`px-4 py-2 rounded-full text-xs sm:text-sm font-bold border flex items-center gap-2 transition-all cursor-pointer ${
+                    className={`shrink-0 px-3.5 py-1.5 rounded-full text-xs font-bold border flex items-center gap-1.5 transition-all cursor-pointer ${
                       isSelected
                         ? isGaming
-                          ? "bg-gradient-to-r from-violet-600 to-indigo-600 border-violet-400 text-white shadow-[0_0_25px_rgba(124,58,237,0.5)]"
+                          ? "bg-gradient-to-r from-violet-600 to-indigo-600 border-violet-400 text-white shadow-[0_0_20px_rgba(124,58,237,0.5)]"
                           : isApp
-                          ? "bg-gradient-to-r from-emerald-600 to-teal-600 border-emerald-400 text-white shadow-[0_0_25px_rgba(16,185,129,0.5)]"
+                          ? "bg-gradient-to-r from-emerald-600 to-teal-600 border-emerald-400 text-white shadow-[0_0_20px_rgba(16,185,129,0.5)]"
                           : "bg-gradient-to-r from-cyan-600 to-blue-600 border-cyan-400 text-white"
-                        : "bg-white/[0.04] border-white/10 text-white/70 hover:bg-white/[0.08] hover:text-white"
+                        : "bg-white/[0.04] border-white/10 text-white/70 hover:text-white"
                     }`}
                   >
                     <span>{isGaming ? "🎮" : isApp ? "📱" : "✨"}</span>
                     <span>{cat}</span>
-                    <span className="text-[11px] opacity-70">({categories[cat]})</span>
+                    <span className="text-[10px] opacity-70">({categories[cat]})</span>
                   </button>
                 );
               })}
             </div>
-          </motion.div>
+          </div>
 
           <div className="mt-10">
             <AnimatePresence mode="wait">
@@ -282,37 +264,25 @@ export function AnimatedHomePage({ games, whatsappNumber }: AnimatedHomePageProp
 
 
       {/* WhatsApp CTA Section */}
-      <section className="bg-gradient-to-r from-[#7C3AED] via-[#A78BFA] to-[#F43F5E] py-16">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <h2 className="font-[var(--font-russo)] text-3xl sm:text-4xl text-white">
-              READY TO TOPUP?
-            </h2>
-            <p className="mt-4 text-lg text-white/90">
-              Order directly via WhatsApp — no signup, no payment gateway. Just send your order and we&apos;ll deliver instantly!
-            </p>
+      <section className="bg-gradient-to-r from-[#7C3AED] via-[#A78BFA] to-[#F43F5E] py-8 px-4 text-center rounded-2xl mx-3 my-6 shadow-[0_8px_30px_rgba(124,58,237,0.3)]">
+        <h2 className="font-[var(--font-russo)] text-xl sm:text-2xl text-white">
+          READY TO TOPUP?
+        </h2>
+        <p className="mt-1.5 text-xs text-white/90 max-w-xs mx-auto">
+          Order directly via WhatsApp — instant delivery, no signup needed!
+        </p>
 
-            <motion.a
-              href={whatsappLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-3 mt-8 px-8 py-4 rounded-full bg-[#25D366] text-white font-bold text-lg shadow-[0_8px_30px_rgba(0,0,0,0.3)] min-h-[56px]"
-              whileHover={{ scale: 1.05, boxShadow: "0 12px 40px rgba(0,0,0,0.4)" }}
-              whileTap={{ scale: 0.95 }}
-              transition={{ duration: 0.2 }}
-            >
-              <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
-                <path d="M12 2a10 10 0 0 0-8.6 15.2L2 22l4.9-1.3A10 10 0 1 0 12 2Zm0 2a8 8 0 0 1 6.9 12.1l-.4.7.3 1-1 .3-.7-.4A8 8 0 0 1 12 4Zm-3.2 4.2c.2 0 .4.1.5.4l.7 1.6c.1.3 0 .5-.2.7l-.6.6c-.1.1-.1.3 0 .4.3.6.8 1.1 1.4 1.4.1.1.3.1.4 0l.6-.6c.2-.2.4-.2.7-.1l1.6.7c.3.1.4.3.4.5v1c0 .3-.2.5-.5.6-1 .2-2.1 0-3.1-.6a8 8 0 0 1-2.3-2.3c-.6-1-.9-2.1-.6-3.1.1-.3.3-.5.6-.5h1Z"/>
-              </svg>
-              Chat on WhatsApp Now
-            </motion.a>
-          </motion.div>
-        </div>
+        <a
+          href={whatsappLink}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center justify-center gap-2 mt-4 w-full py-3 px-5 rounded-full bg-[#25D366] hover:bg-[#1ebe5a] active:scale-95 text-white font-bold text-xs shadow-lg transition-all"
+        >
+          <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+            <path d="M12 2a10 10 0 0 0-8.6 15.2L2 22l4.9-1.3A10 10 0 1 0 12 2Zm0 2a8 8 0 0 1 6.9 12.1l-.4.7.3 1-1 .3-.7-.4A8 8 0 0 1 12 4Zm-3.2 4.2c.2 0 .4.1.5.4l.7 1.6c.1.3 0 .5-.2.7l-.6.6c-.1.1-.1.3 0 .4.3.6.8 1.1 1.4 1.4.1.1.3.1.4 0l.6-.6c.2-.2.4-.2.7-.1l1.6.7c.3.1.4.3.4.5v1c0 .3-.2.5-.5.6-1 .2-2.1 0-3.1-.6a8 8 0 0 1-2.3-2.3c-.6-1-.9-2.1-.6-3.1.1-.3.3-.5.6-.5h1Z"/>
+          </svg>
+          Chat on WhatsApp Now
+        </a>
       </section>
     </div>
   );
