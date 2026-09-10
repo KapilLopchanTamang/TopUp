@@ -1,5 +1,6 @@
 "use client";
-import { motion } from "framer-motion";
+import { useState, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { GameGrid } from "@/components/GameCard";
 import Link from "next/link";
 import type { Game } from "@/lib/types";
@@ -19,7 +20,34 @@ interface AnimatedHomePageProps {
 }
 
 export function AnimatedHomePage({ games, whatsappNumber }: AnimatedHomePageProps) {
-  const whatsappLink = `https://wa.me/${whatsappNumber.replace(/\D/g, "")}?text=${encodeURIComponent("Hi! I want to order gaming topup.")}`;
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+
+  const categories = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const g of games) {
+      const cat = g.category || "Gaming Top-ups";
+      counts[cat] = (counts[cat] || 0) + 1;
+    }
+    return counts;
+  }, [games]);
+
+  const categoryList = useMemo(() => {
+    return Object.keys(categories).sort((a, b) => {
+      if (a === "Gaming Top-ups") return -1;
+      if (b === "Gaming Top-ups") return 1;
+      if (a === "Apps Top-ups") return -1;
+      if (b === "Apps Top-ups") return 1;
+      return a.localeCompare(b);
+    });
+  }, [categories]);
+
+  const filteredGames = useMemo(() => {
+    if (selectedCategory === "all") return games;
+    return games.filter((g) => (g.category || "Gaming Top-ups").toLowerCase() === selectedCategory.toLowerCase());
+  }, [games, selectedCategory]);
+
+  const whatsappLink = `https://wa.me/${whatsappNumber.replace(/\D/g, "")}?text=${encodeURIComponent("Hi! I want to order topup service.")}`;
+
 
   return (
     <div className="min-h-screen">
@@ -155,7 +183,7 @@ export function AnimatedHomePage({ games, whatsappNumber }: AnimatedHomePageProp
         </div>
       </section>
 
-      {/* Games Grid */}
+      {/* Games & Services Grid */}
       <section className="bg-[#0F131C] py-16">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
           <motion.div
@@ -163,17 +191,70 @@ export function AnimatedHomePage({ games, whatsappNumber }: AnimatedHomePageProp
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
+            className="text-center"
           >
-            <h2 className="font-[var(--font-russo)] text-3xl sm:text-4xl tracking-wide text-center">
-              POPULAR GAMES
+            <h2 className="font-[var(--font-russo)] text-3xl sm:text-4xl tracking-wide">
+              TOPUP SERVICES & GAMES
             </h2>
-            <p className="text-center text-white/60 mt-3 text-sm sm:text-base">
-              Tap any game to see packages and order via WhatsApp
+            <p className="text-white/60 mt-3 text-sm sm:text-base max-w-xl mx-auto">
+              Select Gaming Top-ups or App Subscriptions • Tap to see packages and order via WhatsApp
             </p>
+
+            {/* Category Filter Tabs */}
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+              <button
+                type="button"
+                onClick={() => setSelectedCategory("all")}
+                className={`px-4 py-2 rounded-full text-xs sm:text-sm font-bold border transition-all cursor-pointer ${
+                  selectedCategory === "all"
+                    ? "bg-white text-black border-white shadow-[0_0_20px_rgba(255,255,255,0.25)]"
+                    : "bg-white/[0.04] border-white/10 text-white/70 hover:bg-white/[0.08] hover:text-white"
+                }`}
+              >
+                All Services ({games.length})
+              </button>
+
+              {categoryList.map((cat) => {
+                const isSelected = selectedCategory.toLowerCase() === cat.toLowerCase();
+                const isGaming = cat.toLowerCase().includes("game") || cat.toLowerCase().includes("gaming");
+                const isApp = cat.toLowerCase().includes("app");
+
+                return (
+                  <button
+                    key={cat}
+                    type="button"
+                    onClick={() => setSelectedCategory(cat)}
+                    className={`px-4 py-2 rounded-full text-xs sm:text-sm font-bold border flex items-center gap-2 transition-all cursor-pointer ${
+                      isSelected
+                        ? isGaming
+                          ? "bg-gradient-to-r from-violet-600 to-indigo-600 border-violet-400 text-white shadow-[0_0_25px_rgba(124,58,237,0.5)]"
+                          : isApp
+                          ? "bg-gradient-to-r from-emerald-600 to-teal-600 border-emerald-400 text-white shadow-[0_0_25px_rgba(16,185,129,0.5)]"
+                          : "bg-gradient-to-r from-cyan-600 to-blue-600 border-cyan-400 text-white"
+                        : "bg-white/[0.04] border-white/10 text-white/70 hover:bg-white/[0.08] hover:text-white"
+                    }`}
+                  >
+                    <span>{isGaming ? "🎮" : isApp ? "📱" : "✨"}</span>
+                    <span>{cat}</span>
+                    <span className="text-[11px] opacity-70">({categories[cat]})</span>
+                  </button>
+                );
+              })}
+            </div>
           </motion.div>
 
           <div className="mt-10">
-            <GameGrid games={games} whatsappNumber={whatsappNumber} />
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={selectedCategory}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -12 }}
+                transition={{ duration: 0.25 }}
+              >
+                <GameGrid games={filteredGames} whatsappNumber={whatsappNumber} />
+              </motion.div>
+            </AnimatePresence>
           </div>
 
           <motion.div
@@ -189,7 +270,7 @@ export function AnimatedHomePage({ games, whatsappNumber }: AnimatedHomePageProp
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
               >
-                View All Games
+                View Full Catalog ({games.length})
                 <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
                   <path fillRule="evenodd" d="M3 10a.75.75 0 0 1 .75-.75h10.638L10.23 5.29a.75.75 0 1 1 1.04-1.08l5.5 5.25a.75.75 0 0 1 0 1.08l-5.5 5.25a.75.75 0 1 1-1.04-1.08l4.158-3.96H3.75A.75.75 0 0 1 3 10Z" clipRule="evenodd" />
                 </svg>
@@ -198,6 +279,7 @@ export function AnimatedHomePage({ games, whatsappNumber }: AnimatedHomePageProp
           </motion.div>
         </div>
       </section>
+
 
       {/* WhatsApp CTA Section */}
       <section className="bg-gradient-to-r from-[#7C3AED] via-[#A78BFA] to-[#F43F5E] py-16">

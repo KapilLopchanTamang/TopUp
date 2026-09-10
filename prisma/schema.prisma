@@ -12,6 +12,7 @@ model Game {
   id        String         @id @default(cuid())
   slug      String         @unique
   name      String
+  category  String         @default("Gaming Top-ups")
   imageUrl  String?
   sortOrder Int            @default(0)
   isActive  Boolean        @default(true)
@@ -20,7 +21,9 @@ model Game {
   updatedAt DateTime       @updatedAt
 
   @@index([isActive, sortOrder])
+  @@index([category])
 }
+
 
 model PackageGroup {
   id        String       @id @default(cuid())

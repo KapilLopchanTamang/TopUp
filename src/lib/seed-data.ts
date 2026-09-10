@@ -1,11 +1,12 @@
 export type SeedRow = { amountLabel: string; price: string; sortOrder: number; isHighlighted?: boolean };
 export type SeedGroup = { label?: string; sortOrder: number; rows: SeedRow[] };
-export type SeedGame = { slug: string; name: string; imageUrl: string; sortOrder: number; groups: SeedGroup[] };
+export type SeedGame = { slug: string; name: string; category?: string; imageUrl: string; sortOrder: number; groups: SeedGroup[] };
 
 export const seedGames: SeedGame[] = [
   {
     slug: "free-fire",
     name: "Free Fire",
+    category: "Gaming Top-ups",
     imageUrl: "/images/games/free-fire.jpeg",
     sortOrder: 1,
     groups: [
@@ -39,6 +40,7 @@ export const seedGames: SeedGame[] = [
   {
     slug: "tiktok",
     name: "TikTok Coins",
+    category: "Apps Top-ups",
     imageUrl: "/images/games/tiktok.jpeg",
     sortOrder: 2,
     groups: [
@@ -63,20 +65,9 @@ export const seedGames: SeedGame[] = [
         sortOrder: 2,
         rows: [
           { amountLabel: "1120 COIN", price: "2080", sortOrder: 1 },
-          { amountLabel: "1190 COIN", price: "2210", sortOrder: 2 },
-          { amountLabel: "1260 COIN", price: "2340", sortOrder: 3 },
-          { amountLabel: "1330 COIN", price: "2470", sortOrder: 4 },
-          { amountLabel: "1400 COIN", price: "2600", sortOrder: 5 },
-          { amountLabel: "1470 COIN", price: "2730", sortOrder: 6 },
-          { amountLabel: "1540 COIN", price: "2860", sortOrder: 7 },
-          { amountLabel: "1610 COIN", price: "2990", sortOrder: 8 },
-          { amountLabel: "1680 COIN", price: "3120", sortOrder: 9 },
-          { amountLabel: "1750 COIN", price: "3250", sortOrder: 10 },
-          { amountLabel: "1820 COIN", price: "3380", sortOrder: 11 },
-          { amountLabel: "1890 COIN", price: "3510", sortOrder: 12 },
-          { amountLabel: "1960 COIN", price: "3640", sortOrder: 13 },
-          { amountLabel: "2030 COIN", price: "3770", sortOrder: 14 },
-          { amountLabel: "2100 COIN", price: "3900", sortOrder: 15, isHighlighted: true },
+          { amountLabel: "1400 COIN", price: "2600", sortOrder: 2 },
+          { amountLabel: "1750 COIN", price: "3250", sortOrder: 3 },
+          { amountLabel: "2100 COIN", price: "3900", sortOrder: 4, isHighlighted: true },
         ],
       },
     ],
@@ -84,11 +75,12 @@ export const seedGames: SeedGame[] = [
   {
     slug: "pubg-mobile",
     name: "PUBG Mobile",
+    category: "Gaming Top-ups",
     imageUrl: "/images/games/pubg-mobile.jpg",
     sortOrder: 3,
     groups: [
       {
-        label: "UC Packs",
+        label: "Unknown Cash (UC)",
         sortOrder: 1,
         rows: [
           { amountLabel: "60 UC", price: "155", sortOrder: 1 },
@@ -104,7 +96,8 @@ export const seedGames: SeedGame[] = [
   {
     slug: "efootball",
     name: "eFootball",
-    imageUrl: "/images/games/efootball.jpeg",
+    category: "Gaming Top-ups",
+    imageUrl: "/images/games/efootball.png",
     sortOrder: 4,
     groups: [
       {
@@ -135,6 +128,7 @@ export const seedGames: SeedGame[] = [
   {
     slug: "netflix",
     name: "Netflix",
+    category: "Apps Top-ups",
     imageUrl: "/images/games/netflix.png",
     sortOrder: 5,
     groups: [

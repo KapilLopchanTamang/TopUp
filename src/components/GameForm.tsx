@@ -49,6 +49,7 @@ export function GameForm({ initial, action }: { initial?: Game; action: (fd: For
       },
     ];
   });
+  const [category, setCategory] = useState<string>(initial?.category || "Gaming Top-ups");
   const [imageUrl, setImageUrl] = useState<string>(initial?.imageUrl || "");
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string>("");
@@ -56,6 +57,7 @@ export function GameForm({ initial, action }: { initial?: Game; action: (fd: For
   const [isDragging, setIsDragging] = useState(false);
   const [imgLoadError, setImgLoadError] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
 
   async function processFile(file: File) {
     setUploadError("");
@@ -258,6 +260,50 @@ export function GameForm({ initial, action }: { initial?: Game; action: (fd: For
             <p className="text-xs text-white/40 mt-1">URL-friendly identifier (lowercase, hyphens only)</p>
           </label>
         </div>
+
+        {/* Category selector */}
+        <div>
+          <label className="text-sm font-semibold block mb-2">
+            Category <span className="text-red-400">*</span>
+          </label>
+          <div className="flex flex-wrap items-center gap-2 mb-2">
+            <button
+              type="button"
+              onClick={() => setCategory("Gaming Top-ups")}
+              className={`text-xs px-3 py-2 rounded-xl border flex items-center gap-1.5 transition-all ${
+                category === "Gaming Top-ups"
+                  ? "bg-violet-600/30 border-violet-500 text-violet-200 font-bold shadow-[0_0_15px_rgba(124,58,237,0.3)]"
+                  : "bg-white/[0.04] border-white/10 text-white/60 hover:bg-white/[0.08] hover:text-white"
+              }`}
+            >
+              <span>🎮</span> Gaming Top-ups
+            </button>
+            <button
+              type="button"
+              onClick={() => setCategory("Apps Top-ups")}
+              className={`text-xs px-3 py-2 rounded-xl border flex items-center gap-1.5 transition-all ${
+                category === "Apps Top-ups"
+                  ? "bg-emerald-600/30 border-emerald-500 text-emerald-200 font-bold shadow-[0_0_15px_rgba(16,185,129,0.3)]"
+                  : "bg-white/[0.04] border-white/10 text-white/60 hover:bg-white/[0.08] hover:text-white"
+              }`}
+            >
+              <span>📱</span> Apps Top-ups
+            </button>
+          </div>
+          <input
+            type="text"
+            name="category"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            required
+            placeholder="Gaming Top-ups or Apps Top-ups"
+            className={fieldCls}
+          />
+          <p className="text-xs text-white/40 mt-1">
+            Choose a preset or type a custom category. Controls which tab this appears under on the live site.
+          </p>
+        </div>
+
 
         <div>
           <div className="flex items-center justify-between mb-2">

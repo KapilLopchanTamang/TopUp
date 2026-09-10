@@ -19,6 +19,7 @@ export type Game = {
   id: string;
   slug: string;
   name: string;
+  category: string;
   imageUrl: string | null;
   sortOrder: number;
   isActive: boolean;
@@ -26,6 +27,7 @@ export type Game = {
   updatedAt: Date;
   groups: GameGroup[];
 };
+
 
 export type SiteSettings = {
   id: number;

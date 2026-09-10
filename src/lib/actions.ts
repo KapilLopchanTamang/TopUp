@@ -24,6 +24,7 @@ function validatePrice(price: string): boolean {
 export async function createGame(formData: FormData) {
   const name = String(formData.get("name") || "").trim();
   let slug = String(formData.get("slug") || "").trim();
+  const category = String(formData.get("category") || "Gaming Top-ups").trim() || "Gaming Top-ups";
   const imageUrl = String(formData.get("imageUrl") || "").trim() || null;
   const sortOrder = parseInt(String(formData.get("sortOrder") || "0"), 10) || 0;
   const isActive = formData.get("isActive") === "on";
@@ -57,8 +58,9 @@ export async function createGame(formData: FormData) {
   // Use transaction for atomic operation
   await prisma.$transaction(async (tx) => {
     const game = await tx.game.create({
-      data: { name, slug, imageUrl, sortOrder, isActive },
+      data: { name, slug, category, imageUrl, sortOrder, isActive },
     });
+
 
     for (const g of groups) {
       const group = await tx.packageGroup.create({
@@ -93,8 +95,12 @@ export async function updateGame(id: string, formData: FormData) {
   let slug = String(formData.get("slug") || "").trim();
   const imageUrlInput = String(formData.get("imageUrl") || "").trim();
 
-  const existing = await prisma.game.findUnique({ where: { id }, select: { imageUrl: true, slug: true } });
+  const existing = await prisma.game.findUnique({ where: { id }, select: { imageUrl: true, slug: true, category: true } });
   if (!existing) throw new Error("Game not found");
+
+  const category = formData.has("category")
+    ? (String(formData.get("category") || "Gaming Top-ups").trim() || "Gaming Top-ups")
+    : (existing.category || "Gaming Top-ups");
 
   const imageUrl = formData.has("imageUrl") ? (imageUrlInput || null) : (existing.imageUrl || null);
 
@@ -131,7 +137,8 @@ export async function updateGame(id: string, formData: FormData) {
 
   // Use transaction for atomic operation
   await prisma.$transaction(async (tx) => {
-    await tx.game.update({ where: { id }, data: { name, slug, imageUrl, sortOrder, isActive } });
+    await tx.game.update({ where: { id }, data: { name, slug, category, imageUrl, sortOrder, isActive } });
+
 
     await tx.packageGroup.deleteMany({ where: { gameId: id } });
     for (const g of groups) {

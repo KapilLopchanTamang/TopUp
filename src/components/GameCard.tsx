@@ -53,11 +53,25 @@ export function GameCard({ game, whatsappNumber }: GameCardProps) {
               unoptimized
             />
           )}
+          {/* Category Tag */}
+          <div className="absolute top-3 left-3 z-10">
+            <span
+              className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full backdrop-blur-md border flex items-center gap-1 ${
+                (game.category || "").toLowerCase().includes("app")
+                  ? "bg-emerald-950/75 border-emerald-500/40 text-emerald-300 shadow-[0_2px_10px_rgba(16,185,129,0.3)]"
+                  : "bg-violet-950/75 border-violet-500/40 text-violet-300 shadow-[0_2px_10px_rgba(124,58,237,0.3)]"
+              }`}
+            >
+              <span>{(game.category || "").toLowerCase().includes("app") ? "📱" : "🎮"}</span>
+              <span>{(game.category || "").toLowerCase().includes("app") ? "App Topup" : "Gaming"}</span>
+            </span>
+          </div>
           <div className="absolute inset-0 bg-gradient-to-t from-[#0F131C] via-transparent to-transparent opacity-60" />
           <div className="absolute inset-0 pointer-events-none opacity-20" style={{
             background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.03) 2px, rgba(255,255,255,0.03) 4px)'
           }} />
         </motion.div>
+
 
         <div className="p-5 pb-2">
           <h3 className="font-[var(--font-russo)] text-lg tracking-wide text-white group-hover:text-[#A78BFA] transition-colors duration-200">

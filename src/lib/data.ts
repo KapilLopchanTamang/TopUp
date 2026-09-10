@@ -26,6 +26,7 @@ function seedToGame(g: SeedGame): Game {
     id: g.slug,
     slug: g.slug,
     name: g.name,
+    category: g.category || "Gaming Top-ups",
     imageUrl: g.imageUrl,
     sortOrder: g.sortOrder,
     isActive: true,
@@ -34,6 +35,7 @@ function seedToGame(g: SeedGame): Game {
     groups: seedGroups(g),
   };
 }
+
 
 const REVALIDATE_TIME = process.env.NODE_ENV === "development" ? 1 : 3600;
 
