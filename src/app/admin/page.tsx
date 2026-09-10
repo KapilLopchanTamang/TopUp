@@ -28,55 +28,55 @@ export default async function AdminDashboard() {
   return (
     <div className="space-y-6">
       {/* Header and Stats */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-white">Services & Games Catalog</h1>
-          <p className="text-sm text-white/60">
-            Manage your gaming top-ups, app top-ups & subscriptions, pricing tiers, and live availability.
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white">Services & Games Catalog</h1>
+          <p className="text-xs sm:text-sm text-white/60 mt-0.5">
+            Manage your gaming top-ups, app top-ups, packages, pricing, and live availability.
           </p>
         </div>
-        <Button render={<Link href="/admin/games/new" />} className="bg-violet-600 hover:bg-violet-500 text-white font-semibold">
+        <Button render={<Link href="/admin/games/new" />} className="bg-violet-600 hover:bg-violet-500 text-white font-semibold w-full sm:w-auto h-10 min-h-[40px]">
           <Plus className="mr-1 size-4" /> Add Service / Game
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card className="bg-[#0E1220] border-white/10">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs font-semibold uppercase tracking-wider text-white/50">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-4">
+        <Card className="bg-[#0E1220] border-white/10 p-3 sm:p-4">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-0 pb-1.5">
+            <CardTitle className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-white/50">
               Total Services
             </CardTitle>
-            <Gamepad2 className="size-4 text-violet-400" />
+            <Gamepad2 className="size-4 text-violet-400 shrink-0" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-black text-white">{games.length}</div>
-            <p className="text-xs text-white/40 mt-1">Configured catalog offerings</p>
+          <CardContent className="p-0">
+            <div className="text-xl sm:text-2xl font-black text-white">{games.length}</div>
+            <p className="text-[10px] sm:text-xs text-white/40 mt-0.5">Catalog offerings</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-[#0E1220] border-white/10">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs font-semibold uppercase tracking-wider text-white/50">
-              Active Storefront Services
+        <Card className="bg-[#0E1220] border-white/10 p-3 sm:p-4">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-0 pb-1.5">
+            <CardTitle className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-white/50">
+              Active on Store
             </CardTitle>
-            <CheckCircle2 className="size-4 text-emerald-400" />
+            <CheckCircle2 className="size-4 text-emerald-400 shrink-0" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-black text-white">{activeCount}</div>
-            <p className="text-xs text-white/40 mt-1">Visible to public buyers</p>
+          <CardContent className="p-0">
+            <div className="text-xl sm:text-2xl font-black text-emerald-400">{activeCount}</div>
+            <p className="text-[10px] sm:text-xs text-white/40 mt-0.5">Visible to buyers</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-[#0E1220] border-white/10">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs font-semibold uppercase tracking-wider text-white/50">
-              Total Package Options
+        <Card className="bg-[#0E1220] border-white/10 p-3 sm:p-4 col-span-2 sm:col-span-1">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-0 pb-1.5">
+            <CardTitle className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-white/50">
+              Total Packages
             </CardTitle>
-            <Package className="size-4 text-cyan-400" />
+            <Package className="size-4 text-cyan-400 shrink-0" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-black text-white">{totalPackages}</div>
-            <p className="text-xs text-white/40 mt-1">Across all service tiers</p>
+          <CardContent className="p-0">
+            <div className="text-xl sm:text-2xl font-black text-cyan-400">{totalPackages}</div>
+            <p className="text-[10px] sm:text-xs text-white/40 mt-0.5">Across all tiers</p>
           </CardContent>
         </Card>
       </div>

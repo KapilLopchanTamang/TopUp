@@ -17,12 +17,12 @@ export function MobileBottomNav({ whatsappNumber }: MobileBottomNavProps) {
       label: "Home",
       href: "/",
       isActive: pathname === "/",
-      icon: (active: boolean) => (
+      icon: (
         <svg
           viewBox="0 0 24 24"
-          fill={active ? "currentColor" : "none"}
+          fill={pathname === "/" ? "currentColor" : "none"}
           stroke="currentColor"
-          strokeWidth={active ? 2 : 1.8}
+          strokeWidth={pathname === "/" ? 2 : 1.8}
           className="w-5 h-5"
         >
           <path d="M3 10.5 12 3l9 7.5V20a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-4a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-9.5Z" />
@@ -33,12 +33,12 @@ export function MobileBottomNav({ whatsappNumber }: MobileBottomNavProps) {
       label: "Topups",
       href: "/games",
       isActive: pathname.startsWith("/games"),
-      icon: (active: boolean) => (
+      icon: (
         <svg
           viewBox="0 0 24 24"
-          fill={active ? "currentColor" : "none"}
+          fill={pathname.startsWith("/games") ? "currentColor" : "none"}
           stroke="currentColor"
-          strokeWidth={active ? 2 : 1.8}
+          strokeWidth={pathname.startsWith("/games") ? 2 : 1.8}
           className="w-5 h-5"
         >
           <rect x="2" y="6" width="20" height="12" rx="6" />
@@ -53,7 +53,7 @@ export function MobileBottomNav({ whatsappNumber }: MobileBottomNavProps) {
       isAction: true,
       href: whatsappUrl,
       isExternal: true,
-      icon: (_active?: boolean) => (
+      icon: (
         <div className="w-11 h-11 -mt-4 rounded-full bg-gradient-to-tr from-[#128C7E] via-[#25D366] to-[#4ADE80] shadow-[0_4px_20px_rgba(37,211,102,0.45)] flex items-center justify-center border-2 border-[#0F131C] text-white active:scale-95 transition-transform">
           <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
             <path d="M12 2a10 10 0 0 0-8.6 15.2L2 22l4.9-1.3A10 10 0 1 0 12 2Zm0 2a8 8 0 0 1 6.9 12.1l-.4.7.3 1-1 .3-.7-.4A8 8 0 0 1 12 4Zm-3.2 4.2c.2 0 .4.1.5.4l.7 1.6c.1.3 0 .5-.2.7l-.6.6c-.1.1-.1.3 0 .4.3.6.8 1.1 1.4 1.4.1.1.3.1.4 0l.6-.6c.2-.2.4-.2.7-.1l1.6.7c.3.1.4.3.4.5v1c0 .3-.2.5-.5.6-1 .2-2.1 0-3.1-.6a8 8 0 0 1-2.3-2.3c-.6-1-.9-2.1-.6-3.1.1-.3.3-.5.6-.5h1Z" />
@@ -65,12 +65,12 @@ export function MobileBottomNav({ whatsappNumber }: MobileBottomNavProps) {
       label: "Pay",
       href: "/payment-methods",
       isActive: pathname === "/payment-methods",
-      icon: (active: boolean) => (
+      icon: (
         <svg
           viewBox="0 0 24 24"
-          fill={active ? "currentColor" : "none"}
+          fill={pathname === "/payment-methods" ? "currentColor" : "none"}
           stroke="currentColor"
-          strokeWidth={active ? 2 : 1.8}
+          strokeWidth={pathname === "/payment-methods" ? 2 : 1.8}
           className="w-5 h-5"
         >
           <rect width="20" height="14" x="2" y="5" rx="2" />
@@ -82,12 +82,12 @@ export function MobileBottomNav({ whatsappNumber }: MobileBottomNavProps) {
       label: "Contact",
       href: "/contact",
       isActive: pathname === "/contact",
-      icon: (active: boolean) => (
+      icon: (
         <svg
           viewBox="0 0 24 24"
-          fill={active ? "currentColor" : "none"}
+          fill={pathname === "/contact" ? "currentColor" : "none"}
           stroke="currentColor"
-          strokeWidth={active ? 2 : 1.8}
+          strokeWidth={pathname === "/contact" ? 2 : 1.8}
           className="w-5 h-5"
         >
           <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
@@ -113,7 +113,7 @@ export function MobileBottomNav({ whatsappNumber }: MobileBottomNavProps) {
                 aria-label="Instant WhatsApp Order"
                 className="flex flex-col items-center justify-center -mt-1 group cursor-pointer"
               >
-                {item.icon(false)}
+                {item.icon}
                 <span className="text-[10px] font-bold text-[#25D366] mt-0.5 tracking-tight group-hover:text-[#4ADE80]">
                   {item.label}
                 </span>
@@ -138,7 +138,7 @@ export function MobileBottomNav({ whatsappNumber }: MobileBottomNavProps) {
                   active ? "scale-110 drop-shadow-[0_0_8px_rgba(167,139,250,0.6)]" : ""
                 }`}
               >
-                {item.icon(active)}
+                {item.icon}
               </div>
               <span className={`text-[10px] mt-1 tracking-tight ${active ? "text-violet-300" : ""}`}>
                 {item.label}

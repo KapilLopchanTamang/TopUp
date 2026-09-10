@@ -109,7 +109,7 @@ export default async function SettingsPage() {
 
             <Button
               type="submit"
-              className="w-full bg-violet-600 hover:bg-violet-500 text-white font-bold mt-4"
+              className="w-full bg-violet-600 hover:bg-violet-500 active:bg-violet-700 text-white font-bold mt-4 h-11 min-h-[44px] rounded-xl text-sm shadow-md"
             >
               Save Settings
             </Button>

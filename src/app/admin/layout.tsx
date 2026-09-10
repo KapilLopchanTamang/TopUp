@@ -18,6 +18,8 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 
+import { AdminMobileBottomNav } from "@/components/admin/AdminMobileBottomNav";
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
@@ -81,9 +83,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
           </header>
 
-          <main className="flex-1 p-4 sm:p-6 max-w-6xl w-full mx-auto">
+          <main className="flex-1 p-3 sm:p-6 pb-24 md:pb-6 max-w-6xl w-full mx-auto">
             {children}
           </main>
+          <AdminMobileBottomNav />
         </SidebarInset>
       </div>
     </SidebarProvider>

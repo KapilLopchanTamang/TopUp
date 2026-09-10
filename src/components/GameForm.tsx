@@ -509,14 +509,14 @@ export function GameForm({ initial, action }: { initial?: Game; action: (fd: For
             </div>
 
             <div className="space-y-2">
-              <div className="grid grid-cols-[1fr_110px_80px_32px] gap-2 px-1">
+              <div className="grid grid-cols-[1fr_85px_auto_36px] sm:grid-cols-[1fr_110px_70px_36px] gap-1.5 sm:gap-2 px-1">
                 <span className="text-[10px] font-bold tracking-widest text-white/40 uppercase">Amount</span>
-                <span className="text-[10px] font-bold tracking-widest text-white/40 uppercase">Price (NPR)</span>
-                <span className="text-[10px] font-bold tracking-widest text-white/40 uppercase hidden sm:block">Best</span>
+                <span className="text-[10px] font-bold tracking-widest text-white/40 uppercase">Price</span>
+                <span className="text-[10px] font-bold tracking-widest text-white/40 uppercase text-center">Best</span>
                 <span />
               </div>
               {g.rows.map((r, ri) => (
-                <div key={r._key} className="grid grid-cols-[1fr_110px_80px_32px] gap-2 items-center">
+                <div key={r._key} className="grid grid-cols-[1fr_85px_auto_36px] sm:grid-cols-[1fr_110px_70px_36px] gap-1.5 sm:gap-2 items-center">
                   <label className="sr-only" htmlFor={`amount-${gi}-${ri}`}>Amount for group {gi + 1}, row {ri + 1}</label>
                   <input
                     id={`amount-${gi}-${ri}`}
@@ -524,7 +524,7 @@ export function GameForm({ initial, action }: { initial?: Game; action: (fd: For
                     onChange={(e) => updateRowAmount(gi, ri, e.target.value)}
                     placeholder="115 💎"
                     required
-                    className="rounded-xl bg-white/[0.06] border border-white/10 px-3 py-2 text-sm outline-none focus:border-violet-500/60 transition-colors"
+                    className="rounded-xl bg-white/[0.06] border border-white/10 px-2.5 py-2 text-xs sm:text-sm outline-none focus:border-violet-500/60 transition-colors"
                   />
                   <label className="sr-only" htmlFor={`price-${gi}-${ri}`}>Price for group {gi + 1}, row {ri + 1}</label>
                   <input
@@ -536,22 +536,22 @@ export function GameForm({ initial, action }: { initial?: Game; action: (fd: For
                     type="number"
                     min="0"
                     step="0.01"
-                    className="rounded-xl bg-white/[0.06] border border-white/10 px-3 py-2 text-sm outline-none focus:border-violet-500/60 transition-colors"
+                    className="rounded-xl bg-white/[0.06] border border-white/10 px-2.5 py-2 text-xs sm:text-sm outline-none focus:border-violet-500/60 transition-colors"
                   />
-                  <label className="flex items-center justify-center gap-1 text-xs cursor-pointer select-none">
+                  <label className="flex items-center justify-center gap-1 text-xs cursor-pointer select-none px-1">
                     <input
                       type="checkbox"
                       checked={r.isHighlighted}
                       onChange={(e) => updateRowHighlight(gi, ri, e.target.checked)}
-                      className="w-3.5 h-3.5 accent-violet-500"
+                      className="w-4 h-4 accent-violet-500 rounded"
                       aria-label={`Mark as best deal for group ${gi + 1}, row ${ri + 1}`}
                     />
-                    <span className="text-white/60 text-[11px]">Best</span>
+                    <span className="text-white/60 text-[10px] hidden sm:inline">Deal</span>
                   </label>
                   <button
                     type="button"
                     onClick={() => removeRow(gi, ri)}
-                    className="w-8 h-8 rounded-xl bg-white/[0.06] text-white/60 hover:bg-red-500/20 hover:text-red-300 transition-colors text-sm grid place-items-center"
+                    className="w-9 h-9 rounded-xl bg-white/[0.06] text-white/60 hover:bg-red-500/20 hover:text-red-300 transition-colors text-sm grid place-items-center active:scale-95"
                     aria-label={`Remove row ${ri + 1} from group ${gi + 1}`}
                   >
                     ✕
