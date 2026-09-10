@@ -34,6 +34,26 @@ export function StorefrontShell({
   const pathname = usePathname();
   const isAdmin = pathname.startsWith("/admin");
 
+  React.useEffect(() => {
+    try {
+      const clean = () => {
+        document.querySelectorAll("[bis_skin_checked]").forEach((el) => {
+          el.removeAttribute("bis_skin_checked");
+        });
+      };
+      clean();
+      const observer = new MutationObserver((mutations) => {
+        for (const m of mutations) {
+          if (m.type === "attributes" && m.attributeName === "bis_skin_checked" && m.target instanceof Element) {
+            m.target.removeAttribute("bis_skin_checked");
+          }
+        }
+      });
+      observer.observe(document.documentElement, { attributes: true, attributeFilter: ["bis_skin_checked"], subtree: true });
+      return () => observer.disconnect();
+    } catch {}
+  }, []);
+
   // Admin pages should render cleanly with their own dedicated layout/chrome
   if (isAdmin) {
     return <>{children}</>;
